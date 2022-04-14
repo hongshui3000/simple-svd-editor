@@ -1,0 +1,164 @@
+import { Meta, Story, Canvas, ArgsTable } from '@storybook/addon-docs/blocks';
+import { action } from '@storybook/addon-actions';
+import * as Yup from 'yup';
+import { Button, scale } from '@scripts/gds';
+import Form from '@components/controls/Form';
+import Legend from '@components/controls/Legend';
+import { maskPhone, maskDateSingle, maskKpp, maskInn } from '@scripts/mask';
+import { regPhone, regKpp } from '@scripts/regex';
+import validateInn from '@scripts/validateInn';
+import Mask from '.';
+
+<Meta title="Controls / Form / Mask" component={Mask} />
+
+# Mask
+
+<Story
+    name="Controls"
+    args={{ placeholderChar: '_', lazy: false }}
+    argTypes={{ placeholderChar: { control: 'text' }, lazy: { control: 'boolean' } }}
+>
+    {args => (
+        <Form
+            initialValues={{ phone: '' }}
+            validationSchema={Yup.object().shape({
+                phone: Yup.string().matches(regPhone, 'Проверьте телефонный формат').required('Обязательное поле'),
+            })}
+            onSubmit={action('Submit')}
+            css={{ width: '25vw', minWidth: scale(40) }}
+        >
+            <Form.Field name="phone" type="tel">
+                <Legend label="Телефон" hint="Формат: +7(000) 000-00-00" />
+                <Mask mask={maskPhone} {...args} />
+            </Form.Field>
+            <br />
+            <Button type="submit">Submit</Button>
+        </Form>
+    )}
+</Story>
+
+Использует плагин: [imask](https://imask.js.org/), детали для версии под React доступны на [GitHub](https://github.com/uNmAnNeR/imaskjs/tree/master/packages/react-imask).
+
+Маски позволяют упростить пользователю набор текста в инпуты, которые ожидают определённый формат. При этом они никак не заменяют наличие валидации, а нацелены на улучшение UX.
+
+Маски - это один из примеров изменения рендера инпута формы, так что используются через составной компонент: вставку **Mask** внутрь **Form.Field**. Подробнее об этом подходе в документации **Form**.
+
+Все маски проекта хранятся в `scripts/mask.js` и импортируются оттуда по месту использования. В данном плагине в качестве маски может использоваться RegExp, Function, Number, Date.
+
+## Props
+
+<ArgsTable story="Controls" />
+
+## Use cases
+
+### Phone
+
+<Canvas>
+    <Story name="Phone">
+        <Form
+            initialValues={{ phone: '' }}
+            validationSchema={Yup.object().shape({
+                phone: Yup.string().matches(regPhone, 'Проверьте телефонный формат').required('Обязательное поле'),
+            })}
+            onSubmit={action('Submit')}
+            css={{ width: '25vw', minWidth: scale(40) }}
+        >
+            <Form.Field name="phone" type="tel">
+                <Legend label="Телефон" hint="Формат: +7(000) 000-00-00" />
+                <Mask mask={maskPhone} />
+            </Form.Field>
+            <br />
+            <Button type="submit">Submit</Button>
+        </Form>
+    </Story>
+</Canvas>
+
+### Date (single)
+
+<Canvas>
+    <Story name="Date (single)">
+        <Form
+            initialValues={{ dateSingle: null }}
+            validationSchema={Yup.object().shape({
+                dateSingle: Yup.string().nullable().required('Обязательное поле'),
+            })}
+            onSubmit={action('Submit')}
+            css={{ width: '25vw', minWidth: scale(40) }}
+        >
+            <Form.Field name="dateSingle">
+                <Legend label="Одиночная дата" hint="Формат: dd.MM.yyyy" />
+                <Mask mask={maskDateSingle} />
+            </Form.Field>
+            <br />
+            <Button type="submit">Submit</Button>
+        </Form>
+    </Story>
+</Canvas>
+
+### Date (range)
+
+<Canvas>
+    <Story name="Date (range)">
+        <Form
+            initialValues={{ dateRange: null }}
+            validationSchema={Yup.object().shape({
+                dateRange: Yup.string().nullable().required('Обязательное поле'),
+            })}
+            onSubmit={action('Submit')}
+            css={{ width: '25vw', minWidth: scale(40) }}
+        >
+            <Form.Field name="dateRange">
+                <Legend label="Диапазон дат" hint="Формат: dd.MM.yyyy — dd.MM.yyyy" />
+                <Mask mask="from - to" blocks={{ from: { mask: Date }, to: { mask: Date } }} />
+            </Form.Field>
+            <br />
+            <Button type="submit">Submit</Button>
+        </Form>
+    </Story>
+</Canvas>
+
+### KPP
+
+<Canvas>
+    <Story name="KPP">
+        <Form
+            initialValues={{ kpp: '' }}
+            validationSchema={Yup.object().shape({
+                kpp: Yup.string().matches(regKpp, 'Проверьте формат КПП').required('Обязательное поле'),
+            })}
+            onSubmit={action('Submit')}
+            css={{ width: '25vw', minWidth: scale(40) }}
+        >
+            <Form.Field name="kpp">
+                <Legend label="КПП" hint="Формат: 0000AA000" />
+                <Mask mask={maskKpp} />
+            </Form.Field>
+            <br />
+            <Button type="submit">Submit</Button>
+        </Form>
+    </Story>
+</Canvas>
+
+### INN
+
+<Canvas>
+    <Story name="INN">
+        <Form
+            initialValues={{ inn: '' }}
+            validationSchema={Yup.object().shape({
+                inn: Yup.string()
+                    .test('inn', 'Проверьте формат ИНН', value => validateInn(value))
+                    .required('Обязательное поле'),
+            })}
+            onSubmit={action('Submit')}
+            css={{ width: '25vw', minWidth: scale(40) }}
+        >
+            <Form.Field name="inn">
+                <Legend label="ИНН" hint="Формат: 000000000099" />
+                <Mask mask={maskInn} />
+            </Form.Field>
+            <br />
+            <Button type="submit">Submit</Button>
+        </Form>
+    </Story>
+</Canvas>

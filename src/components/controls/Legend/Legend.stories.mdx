@@ -1,0 +1,48 @@
+import { Meta, Story, Canvas, ArgsTable } from '@storybook/addon-docs/blocks';
+import Legend from '@components/controls/Legend';
+
+<Meta title="Controls / Form / Legend" component={Legend} />
+
+# Legend
+
+Легенда. Исопльзуется в полях формы. Имеется лейбл, подсказка и текст сообщения.
+
+<Story
+    name="Controls"
+    args={{
+        as: 'fieldset',
+        label: 'Пример текста',
+        required: false,
+        hint: 'Подсказка',
+        showMessage: false,
+        messageType: 'warning',
+        messageText: 'Есть изменения',
+    }}
+    argTypes={{ required: { control: 'boolean' } }}
+>
+    {args => <Legend {...args} />}
+</Story>
+
+## Props
+
+<ArgsTable story="Controls" />
+
+### Use cases
+
+<Canvas>
+    <Story
+        name="With form message"
+        args={{
+            as: 'label',
+            label: 'Пример текста',
+            required: true,
+            hint: 'Подсказка',
+            showMessage: true,
+            messageType: 'warning',
+            messageText: 'Есть изменения',
+        }}
+        argTypes={{ required: { control: 'boolean' }, messageType: { options: ['warning', 'error'] } }}
+    >
+        {args => <Legend {...args} />}
+    </Story>
+</Canvas>

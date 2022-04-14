@@ -1,0 +1,37 @@
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import Block from '@components/Block';
+import { Button } from '@scripts/gds';
+
+<Meta
+    title="Components / Block"
+    component={Block}
+    parameters={{ backgrounds: { default: 'grey200' }, paddings: { default: 'Large' } }}
+/>
+
+# Block
+
+<Story name="Block">
+    <Block>
+        <Block.Header>
+            Шапка{' '}
+            <a href="/" style={{ color: 'blue' }}>
+                Link
+            </a>
+        </Block.Header>
+        <Block.Body>
+            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Doloribus reprehenderit distinctio provident.
+            Minima perspiciatis officia excepturi quasi nam ullam. Architecto odio porro excepturi harum a et eum fugiat
+            eligendi iusto. Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eaque ipsum similique tenetur quas
+            dolore nam animi enim, veniam ipsa cum ea, atque iure neque officiis, nisi blanditiis natus quasi in!
+        </Block.Body>
+        <Block.Footer>
+            Футер <Button theme="primary">Кнопка</Button>{' '}
+        </Block.Footer>
+    </Block>
+</Story>
+
+## Description
+
+Компонент Block служит в качестве болванки для других компонентов. В основном весь дизайн построен на этих блоках.
+Можно исопльзовать без Header, Footer.
+Header и Footer стилизованы как display: flex с justify-content: space-between

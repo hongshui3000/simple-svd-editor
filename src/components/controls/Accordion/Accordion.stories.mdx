@@ -1,0 +1,309 @@
+import { Meta, Story, Canvas, ArgsTable } from '@storybook/addon-docs/blocks';
+import PlusIcon from '@icons/plus.svg';
+import Accordion from '.';
+
+<Meta title="Controls / Accordion" component={Accordion} />
+
+# Accordion
+
+<Story name="Basic">
+    <Accordion>
+        <Accordion.Item>
+            <Accordion.Heading>
+                <Accordion.Button>Title 1</Accordion.Button>
+            </Accordion.Heading>
+            <Accordion.Panel>Panel 1</Accordion.Panel>
+        </Accordion.Item>
+        <Accordion.Item>
+            <Accordion.Heading>
+                <Accordion.Button>Title 2</Accordion.Button>
+            </Accordion.Heading>
+            <Accordion.Panel>Panel 2</Accordion.Panel>
+        </Accordion.Item>
+        <Accordion.Item>
+            <Accordion.Heading>
+                <Accordion.Button>Title 3</Accordion.Button>
+            </Accordion.Heading>
+            <Accordion.Panel>Panel 3</Accordion.Panel>
+        </Accordion.Item>
+        <Accordion.Item>
+            <Accordion.Heading>
+                <Accordion.Button>Title 4</Accordion.Button>
+            </Accordion.Heading>
+            <Accordion.Panel>Panel 4</Accordion.Panel>
+        </Accordion.Item>
+    </Accordion>
+</Story>
+
+Использует плагин: [react-accessible-accordion](https://github.com/springload/react-accessible-accordion).
+
+Спецификация: [WAI-ARIA](https://www.w3.org/TR/wai-aria-practices/#accordion).
+
+Это **uncontrolled component**, т.е. управление стейтом у него происходит внутри, а снаружи доступно указание изначально открытых вкладок через **preExpanded** и обработчик, срабатывающий при смене вкладки, внутри которого есть доступ к списку id открытых вкладок - **onChange**.
+
+Доступно несколько режимов открытия: по умолчанию разрешено одновременное открытие/закрытие любого числа вкладок, но можно запретить одновременное открытие нескольких вкладок через **allowMultipleExpanded={false}** или одновременное закрытие всех вкладок через **allowZeroExpanded={true}**.
+
+Если **preExpanded** указывать не требуется, то можно не указывать id вкладкам. При необходимости же они передаются в **Accordion.Item** через проп **uuid**. Можно передавать uuid только тем элементам, на которые будут ссылки.
+
+Аккордеон по умолчанию не включает анимацию, но её можно активировать, либо выбрав из списка предопределённых, либо прописав собственную (см. примеры).
+
+♿️ В качестве заголовков используются div с **aria-level**. По умолчанию он равен 3, но должен быть изменён на странице на тот, который соответствует каскадной структуре заголовков страницы. Для этого используется проп aria-level **Accordion.Heading**.
+
+❗️ У аккордеонов нет **disabled** статуса вкладок. Это обусловлено спецификацией и отдельно прописано в [FAQ плагина](https://github.com/springload/react-accessible-accordion#faqs).
+
+## Props
+
+<ArgsTable
+    components={{
+        Accordion,
+        'Accordion.Item': Accordion.Item,
+        'Accordion.Heading': Accordion.Heading,
+        'Accordion.Button': Accordion.Button,
+        'Accordion.Panel': Accordion.Panel,
+    }}
+/>
+
+## Use cases
+
+### No multiple expanded
+
+<Canvas>
+    <Story name="No multiple expanded">
+        <Accordion allowMultipleExpanded={false}>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 1</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 1</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 2</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 2</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 3</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 3</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 4</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 4</Accordion.Panel>
+            </Accordion.Item>
+        </Accordion>
+    </Story>
+</Canvas>
+
+### No zero expanded
+
+<Canvas>
+    <Story name="No zero expanded">
+        <Accordion allowZeroExpanded={false}>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 1</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 1</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 2</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 2</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 3</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 3</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 4</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 4</Accordion.Panel>
+            </Accordion.Item>
+        </Accordion>
+    </Story>
+</Canvas>
+
+### Pre expanded
+
+<Canvas>
+    <Story name="Pre expanded">
+        <Accordion preExpanded={[1]}>
+            <Accordion.Item uuid={0}>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 1</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 1</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item uuid={1}>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 2</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 2</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item uuid={2}>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 3</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 3</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item uuid={3}>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 4</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 4</Accordion.Panel>
+            </Accordion.Item>
+        </Accordion>
+    </Story>
+</Canvas>
+
+### Animation (height)
+
+<Canvas>
+    <Story name="Animation (height)">
+        <Accordion animationType="height">
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 1</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 1</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 2</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 2</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 3</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 3</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 4</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 4</Accordion.Panel>
+            </Accordion.Item>
+        </Accordion>
+    </Story>
+</Canvas>
+
+### Animation (fade in)
+
+<Canvas>
+    <Story name="Animation (fadeIn)">
+        <Accordion animationType="fadeIn" transitionTimeout={600} transitionTimeoutExit={0}>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 1</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 1</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 2</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 2</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 3</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 3</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 4</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 4</Accordion.Panel>
+            </Accordion.Item>
+        </Accordion>
+    </Story>
+</Canvas>
+
+### Animation (custom)
+
+<Canvas>
+    <Story name="Animation (custom)">
+        <Accordion
+            animationType="custom"
+            onEnter={instance => {
+                instance.style.transition = `transform ease 600ms`;
+                instance.style.transform = `scale(0,0)`;
+            }}
+            onEntering={instance => {
+                instance.style.transform = `scale(1,1)`;
+            }}
+            onExit={instance => {
+                instance.style.transform = `scale(0,0)`;
+            }}
+        >
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 1</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 1</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 2</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 2</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 3</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 3</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 4</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 4</Accordion.Panel>
+            </Accordion.Item>
+        </Accordion>
+    </Story>
+</Canvas>
+
+### Custom icon
+
+<Canvas>
+    <Story name="Custom icon">
+        <Accordion Icon={PlusIcon}>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 1</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 1</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 2</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 2</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 3</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 3</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item>
+                <Accordion.Heading>
+                    <Accordion.Button>Title 4</Accordion.Button>
+                </Accordion.Heading>
+                <Accordion.Panel>Panel 4</Accordion.Panel>
+            </Accordion.Item>
+        </Accordion>
+    </Story>
+</Canvas>

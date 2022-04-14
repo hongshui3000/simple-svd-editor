@@ -1,0 +1,33 @@
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import ContentBlock from '@components/ContentBlock';
+import { action } from '@storybook/addon-actions';
+
+<Meta
+    title="Components / ContentBlock"
+    component={ContentBlock}
+    parameters={{ backgrounds: { default: 'grey200' }, paddings: { default: 'Large' } }}
+/>
+
+<Story
+    name="ContentBlock"
+    args={{
+        title: 'Название карточки',
+        type: 'text',
+        img: '/logo.svg',
+        video: 'juuhfF4cbSM',
+        text: 'один | два | три',
+        textPlaceholder: '',
+        onEdit: action('edit'),
+        onRemove: action('remove'),
+    }}
+    argTypes={{
+        type: {
+            options: ['image', 'video', 'text', 'list'],
+            control: { type: 'select' },
+        },
+    }}
+>
+    {args => <ContentBlock {...args} />}
+</Story>
+
+Компонент отображения контента. Будет дорабатываться в процессе необходимости

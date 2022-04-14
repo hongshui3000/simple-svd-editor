@@ -1,0 +1,34 @@
+import { Meta, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { action } from '@storybook/addon-actions';
+import mockMenu from '@scripts/data/menu';
+
+import Sidebar from '@components/Sidebar';
+
+<Meta title="Components / Sidebar" component={Sidebar} />
+
+# Sidebar
+
+<Story
+    name="Sidebar"
+    args={{
+        isCutDown: false,
+        cutDownHandler: action('cutDownHandler'),
+        setOverlay: action('setOverlay'),
+        menuItems: mockMenu,
+    }}
+    argTypes={{
+        isCutDown: { control: 'boolean', description: 'Включить усеченный вид' },
+    }}
+>
+    {args => <Sidebar {...args} />}
+</Story>
+
+Боковое меню, используется на всех страницах и может находиться в двух состояниях: раскрытом и свернутом.
+
+В коде можно передать проп hasChanges, который добавляет зеленый кружочек к пункту меню. Пока неясно, откуда брать данные о том, выводить этот кружочек или нет. Поэтому ждем прояснения, а потом дописываем нужную логику.
+
+<br />
+
+## Args Table
+
+<ArgsTable story="Sidebar" />

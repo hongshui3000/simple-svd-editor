@@ -1,0 +1,35 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "downlevelIteration": true,
+        "importHelpers": true,
+        "lib": ["dom", "dom.iterable", "esnext"],
+        "allowJs": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "noEmit": true,
+        "esModuleInterop": true,
+        "module": "esnext",
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "jsx": "preserve",
+        "jsxImportSource": "@emotion/core",
+        "baseUrl": ".",
+        "paths": {
+            "@components/*": ["src/components/*"],
+            "@containers/*": ["src/containers/*"],
+            "@scripts/*": ["src/scripts/*"],
+            "@hooks/*": ["src/scripts/hooks/*"],
+            "@icons/*": ["src/icons/*"],
+            "@views/*": ["src/views/*"],
+            "@controls/*": ["src/components/controls/*"],
+            "@customTypes/*": ["src/types/*"],
+            "@context/*": ["src/context/*"],
+            "@api/*": ["src/api/*"]
+        }
+    },
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+    "exclude": ["node_modules"]
+}

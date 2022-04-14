@@ -1,0 +1,5 @@
+.load-wrapper {
+    &__loader {
+        margin: calc(var(--gs) * 3) auto;
+    }
+}

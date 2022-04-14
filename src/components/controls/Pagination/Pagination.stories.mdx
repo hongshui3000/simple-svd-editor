@@ -1,0 +1,30 @@
+import { Meta, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+
+import Pagination from '@components/controls/Pagination';
+
+<Meta
+    title="Controls / Pagination"
+    component={Pagination}
+    parameters={{
+        nextRouter: { query: { page: 2, filter: 'food' } },
+    }}
+/>
+
+# Pagination
+
+<Story
+    name="Pagination"
+    args={{
+        pages: 15,
+        baseNumberPages: 7,
+    }}
+>
+    {args => <Pagination {...args} />}
+</Story>
+
+Компонент переключения страниц. Встречается на всех страницах у которых есть раздельная подгрузка данных.
+Имеет 4 состояния, каждый из которых соответствует енуму "Positions"
+
+## Args
+
+<ArgsTable story="Pagination" />

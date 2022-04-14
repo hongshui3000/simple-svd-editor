@@ -1,0 +1,44 @@
+import { Meta, Story, ArgsTable, Canvas } from '@storybook/addon-docs/blocks';
+import { action } from '@storybook/addon-actions';
+import { columns, makeData, makeNestedData } from '@scripts/mock';
+
+import OldTable, { makeStringRow } from '@components/OldTable';
+
+<Meta title="Components / Deprecated / OldTable" component={OldTable} />
+
+# OldTable !deprecated!
+
+Use Table component instead
+
+<Story
+    name="OldTable"
+    args={{
+        columns,
+        data: [...makeData(2), makeStringRow(42, 'Вторая половина таблицы:'), ...makeData(2)],
+        editRow: action('editRow'),
+    }}
+>
+    {args => <OldTable {...args} />}
+</Story>
+
+Таблица c товарами. Используется плагин: [react-table](https://github.com/tannerlinsley/react-table). Компонент принимает на вход массивы со столбцами и данными и выводит их в виде таблицы. Поддерживает выделение ячеек. Также принимает метод для обработки клика при нажатии на кнопку с троеточием.
+
+К таблице прикручен плагин react-beautifyl-dnd. Для того, чтобы можно было осуществлять перетаскивание рядов, нужно прокинуть проп isDragDisabled={false}, так как по умолчанию, он true, а также хранить data в стейте родительского компонента и в качестве пропсов прокидывать setData, она используется для изменения порядка data в таблице после перетаскивания. см пример на странице /content/search-requests
+
+Для того, чтобы ряд, который драгается, не схлопывался, у таблицы должен обязательно быть `<colgroup><col width="n#"/></colgroup>`, где `<col />` задается для каждого столбца таблицы. Через js для каждой ячейки таблицы проставляется ширина
+
+Чтобы добавить ряд без колонок необходимо использовать метод `makeStringRow(id: number, string: string)`, при формировании строк таблицы.
+
+## Props
+
+<ArgsTable story="OldTable" />
+
+## Use cases
+
+### Expand
+
+<Canvas>
+    <Story name="Expand">
+        <OldTable columns={columns} data={makeNestedData(4, 4)} expandable />
+    </Story>
+</Canvas>

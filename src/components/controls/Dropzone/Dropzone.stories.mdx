@@ -1,0 +1,111 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import { action } from '@storybook/addon-actions';
+import * as Yup from 'yup';
+import { ErrorMessages } from '@scripts/constants';
+import { Button } from '@scripts/gds';
+import Form from '@components/controls/Form';
+import Dropzone from '@components/controls/Dropzone';
+
+<Meta title="Controls / Dropzone" component={Dropzone} />
+
+# Dropzone
+
+Компонент Dropzone написан на основе react-dropzone и react-beautiful-dnd.
+
+**Преимущества**:
+
+-   удобен в стилизации
+-   интегрирован с Formik
+-   доступно превью картинок (только для пропа `accept='image/\*'`)
+-   возможность использовать без Formik'a (прокинуть проп `onFilesChange`)
+-   возможность сортировки перетаскиванием
+-   два вида отображения: кнопка или дропзона
+
+**Некоторые особенности**
+
+Возникают случаи, когда файлы, а именно картинки, уже загружены на сервер, а нам известен только url до файла. Если нам нужно показать превь этих картинок, то придется из выкачать. Используй метод `downloadFile` из `@components/controls/Dropzone/utils`.
+
+Проп `maxFileSize` принимает значение в байтах
+
+Текст некоторых ошибок зашит глубоко в хук `useDropzone` от react-dropzone. С ними ничего сделать не можем. Либо заменять логику, выполняемую хуком на логику, которою напишем мы сами
+
+Список mime-type'ов файлов смотри [здесь](https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_MIME-%D1%82%D0%B8%D0%BF%D0%BE%D0%B2)
+Указываются в пропе `accept`
+
+## Controls with preloaded File
+
+<Story
+    name="Controls With preloaded File"
+    args={{
+        onFilesChange: action('change'),
+        onFileRemove: action('file remove'),
+        disabled: false,
+        isDragDisabled: false,
+        simple: false,
+        previouslyLoadedFiles: ['/logo.svg'],
+        accept: ['application/pdf', '.svg'],
+        maxFiles: 10,
+        maxFileSize: 1000000,
+    }}
+>
+    {args => (
+        <div style={{ width: '1000px' }}>
+            <Form
+                initialValues={{ files: [] }}
+                onSubmit={action('submit')}
+                validationSchema={Yup.object().shape({
+                    files: Yup.array().min(2, ErrorMessages.MIN_FILES(2)),
+                })}
+            >
+                <Form.Field name="files" label="Прикрепи файл" hint="Подсказка">
+                    <Dropzone {...args} />
+                </Form.Field>
+                <Button type="submit">Отправить</Button>
+            </Form>
+        </div>
+    )}
+</Story>
+
+## Images preview
+
+<Canvas>
+    <Story
+        name="Images preview"
+        args={{
+            accept: 'image/*',
+        }}
+    >
+        {args => (
+            <div style={{ width: '1000px' }}>
+                <Form initialValues={{ files: [] }} onSubmit={action('submit')}>
+                    <Form.Field name="files" label="Прикрепи картинку" hint="png, jpg, jpeg">
+                        <Dropzone {...args} />
+                    </Form.Field>
+                    <Button type="submit">Отправить</Button>
+                </Form>
+            </div>
+        )}
+    </Story>
+</Canvas>
+
+## Button-like view
+
+<Canvas>
+    <Story
+        name="Button-like view"
+        args={{
+            simple: true,
+        }}
+    >
+        {args => (
+            <div style={{ width: '1000px' }}>
+                <Form initialValues={{ files: [] }} onSubmit={action('submit')}>
+                    <Form.Field name="files">
+                        <Dropzone {...args} />
+                    </Form.Field>
+                    <Button type="submit">Отправить</Button>
+                </Form>
+            </div>
+        )}
+    </Story>
+</Canvas>

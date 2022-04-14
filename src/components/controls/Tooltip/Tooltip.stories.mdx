@@ -1,0 +1,126 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import { action } from '@storybook/addon-actions';
+import { Button, scale } from '@scripts/gds';
+import Tooltip, { StyledTooltip, ContentBtn } from '.';
+
+<Meta title="Controls / Tooltip" component={Tooltip} />
+
+# Tooltip
+
+<Story
+    name="Knobs"
+    args={{
+        content: 'Hello, world!',
+        placement: 'right',
+        duration: 250,
+        delay: 0,
+        distance: 10,
+        onMount: action('onMount'),
+        onHide: action('onHide'),
+        onTrigger: action('onTrigger'),
+        trigger: 'mouseenter focusin',
+        arrow: true,
+    }}
+    argTypes={{
+        placement: { control: { type: 'select', options: ['top', 'right', 'bottom', 'left'] } },
+        trigger: { control: { type: 'select', options: ['mouseenter focusin', 'click'] } },
+        duration: { control: { type: 'range', min: 0, step: 100, max: 5000 } },
+        delay: { control: { type: 'range', min: 0, step: 20, max: 5000 } },
+        distance: { control: { type: 'number', min: 0 } },
+        arrow: { control: 'boolean' },
+    }}
+>
+    {args => (
+        <Tooltip {...args}>
+            <Button>Button</Button>
+        </Tooltip>
+    )}
+</Story>
+
+Использует плагин: [tippy.js-react](https://github.com/atomiks/tippy.js-react) - это обёртка вокруг оригинального [Tippy](https://atomiks.github.io/tippyjs/).
+
+Тултип допускает рендер не только текста, но и полноценных компонентов в качестве контента.
+
+Тултипы по умолчанию интерактивны, располагаются в разметке рядом с элементом триггера для возможности табуляции, добавлена дополнительная обработка aria-атрибутов.
+
+По умолчанию тултип имеет анимацию fade. Можно импортировать другие варианты или создать свои. Подробнее в [документации](https://atomiks.github.io/tippyjs/v6/animations/).
+
+❗️ Элемент для триггера должен давать возможность установить ref. Это означает, что это должен быть либо нативный элемент, либо компонент, обёрнутый в forwardRef.
+
+## Props
+
+Пропсы наследуются от Tippy: [All Props](https://atomiks.github.io/tippyjs/v6/all-props/).
+
+## Use cases
+
+### Basic
+
+<Canvas>
+    <Story name="Basic">
+        <Tooltip content="Default" placement="right">
+            <Button>Default</Button>
+        </Tooltip>
+        <br />
+        <br />
+        <StyledTooltip content="Default" placement="right">
+            <Button theme="ghost">with default icon </Button>
+        </StyledTooltip>
+        <br />
+        <br />
+        <StyledTooltip content="Default" placement="right" iconType="success">
+            <Button theme="secondary">with success icon</Button>
+        </StyledTooltip>
+        <br />
+        <br />
+        <StyledTooltip content="Default" placement="right" iconType="error">
+            <Button theme="dangerous">with error icon</Button>
+        </StyledTooltip>
+    </Story>
+</Canvas>
+
+### Dropdown
+
+<Canvas>
+    <Story name="Dropdown">
+        <Tooltip
+            arrow
+            theme="light"
+            placement="bottom-end"
+            trigger="click"
+            minWidth={scale(36)}
+            content={
+                <ul>
+                    <li>
+                        <ContentBtn type="edit">Изменить статус</ContentBtn>
+                    </li>
+                    <li>
+                        <ContentBtn type="edit">Изменить атрибут</ContentBtn>
+                    </li>
+                    <li>
+                        <ContentBtn type="edit">Изменить категоризацию</ContentBtn>
+                    </li>
+                    <li>
+                        <ContentBtn type="edit">Задать признаки</ContentBtn>
+                    </li>
+                    <li>
+                        <ContentBtn type="edit">Отправить на модерацию</ContentBtn>
+                    </li>
+                    <li>
+                        <ContentBtn type="copy">Копировать ID</ContentBtn>
+                    </li>
+                    <li>
+                        <ContentBtn type="copy">Копировать артикул</ContentBtn>
+                    </li>
+                    <li>
+                        <ContentBtn type="export">Экспорт товаров</ContentBtn>
+                    </li>
+                    <li>
+                        <ContentBtn type="delete">Удалить</ContentBtn>
+                    </li>
+                </ul>
+            }
+        >
+            <Button type="button">Click me</Button>
+        </Tooltip>
+    </Story>
+</Canvas>

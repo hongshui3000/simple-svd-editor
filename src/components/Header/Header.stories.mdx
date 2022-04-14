@@ -1,0 +1,31 @@
+import { Meta, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { action } from '@storybook/addon-actions';
+
+import Header from './index';
+
+<Meta title="Components / Header" component={Header} />
+
+# Sidebar
+
+<Story
+    name="Header"
+    args={{
+        onLogout: action('logout'),
+        breadcrumb: {
+            text: 'Дочернаяя хлебная крошка',
+            parent: [{ link: '/', text: 'Родительская хлебная крошка', parent: [] }],
+        },
+    }}
+    argTypes={{
+        onLogout: { constrol: 'object', description: 'Коллбэк при клике на кнопку "Выйти"' },
+        breadcrumb: { control: 'object', description: 'Объект, содержащий информацию о хлебных крошках' },
+    }}
+>
+    {args => <Header {...args} />}
+</Story>
+
+<br />
+
+## Args Table
+
+<ArgsTable story="Header" />

@@ -1,0 +1,148 @@
+import { useState } from 'react';
+import { Meta, Story, Canvas, ArgsTable } from '@storybook/addon-docs/blocks';
+import { action } from '@storybook/addon-actions';
+import { Button } from '@scripts/gds';
+import * as Yup from 'yup';
+import Form from '@components/controls/Form';
+import Counter from '.';
+
+<Meta title="Controls / Counter" component={Counter} />
+
+# Counter
+
+<Story
+    name="Controls"
+    args={{
+        name: 'counter-knobs',
+        initialValue: 0,
+        label: 'Выберите количество товара',
+        min: 1,
+        max: 999,
+        step: 1,
+        vertical: false,
+        isHiddenLegend: true,
+    }}
+    argTypes={{
+        vertical: {
+            control: 'boolean',
+        },
+        isHiddenLegend: {
+            control: 'boolean',
+        },
+        step: {
+            control: {
+                type: 'range',
+                min: 0,
+                max: 999,
+                step: 1,
+            },
+        },
+        max: {
+            control: {
+                type: 'number',
+                max: 999,
+                min: 1,
+            },
+        },
+        min: {
+            control: {
+                type: 'number',
+                max: 999,
+                min: 1,
+            },
+        },
+    }}
+>
+    {args => <Counter {...args} />}
+</Story>
+
+Счётчики реализуются через поле с type="number", что позволяет из коробки иметь ряд удобств: цифровая клавиатура на тачах, управление через колёсико мыши, встроенные атрибуты и обработчики.
+
+❗️ type="number" накладывает ряд ограничений: не должно быть значений менее 0 и нецелочисленных шагов, т.к. их нет на клавиатурах некоторых девайсов (Samsung Android). Также запрещено вставлять внутрь что-либо кроме чисел, например, единицы измерения. Если какое-то из этих ограничений нарушается, то нужно реализовать для таких кейсов альтернативную версию через type="text", которая однако уже не будет такой удобной.
+
+## Props
+
+<ArgsTable story="Controls" />
+
+## Use cases
+
+### Uncontrolled
+
+Использование счетчика без дополнительной логики, т.е. вся логика по управлению компонента, зашита внутри компонента.
+
+<Canvas>
+    <Story name="Uncontrolled">
+        <Counter name="counter-uncontrolled" label="Выберите количество товара" />
+    </Story>
+</Canvas>
+
+### Controlled
+
+Использование счетчика с дополнительной логикой, это позволит использовать стейт менеджмент, т.е. управлять значением счетчика извне.
+
+<Canvas>
+    <Story name="Controlled">
+        {() => {
+            const CounterExample = () => {
+                const [value, setValue] = useState(1);
+                return (
+                    <>
+                        <Button css={{ marginRight: '12px' }} theme="secondary" onClick={() => setValue(5)}>
+                            Set 5
+                        </Button>
+                        <Counter
+                            name="counter-controlled"
+                            label="Выберите количество товара"
+                            value={value}
+                            onChange={newValue => setValue(newValue)}
+                        />
+                    </>
+                );
+            };
+            return <CounterExample />;
+        }}
+    </Story>
+</Canvas>
+
+### Custom
+
+Пример счетчика с кастомными параметрами.
+
+<Canvas>
+    <Story name="Custom">
+        <Counter name="counter-custom" label="Выберите количество товара" initialValue={2} min={1} max={999} step={2} />
+    </Story>
+</Canvas>
+
+### Vertical
+
+Использование счетчика с вертикальным отображением.
+
+<Canvas>
+    <Story name="Vertical">
+        <Counter name="counter-vertical" label="Выберите количество товара" vertical />
+    </Story>
+</Canvas>
+
+### With Form
+
+Использование счетчика с формой.
+
+<Canvas>
+    <Story name="Form">
+        <Form
+            initialValues={{ counter: 1 }}
+            validationSchema={Yup.object().shape({
+                counter: Yup.number().required('Обязательное поле'),
+            })}
+            onSubmit={action('Submit')}
+            style={{ width: '25vw', minWidth: '320px' }}
+        >
+            <Form.Field name="counter">
+                <Counter id="counter" label="Выберите количество товара" />
+            </Form.Field>
+            <br />
+            <Button type="submit">Submit</Button>
+        </Form>
+    </Story>
+</Canvas>

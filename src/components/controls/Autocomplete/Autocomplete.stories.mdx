@@ -1,0 +1,197 @@
+import { Meta, Story, ArgsTable, Canvas } from '@storybook/addon-docs/blocks';
+import * as Yup from 'yup';
+
+import { wait } from '@scripts/helpers';
+import { mockSearchResultItems } from '@scripts/mock';
+import { Button } from '@scripts/gds';
+
+import Form from '@components/controls/Form';
+
+import { getSuggestions } from '@api/dadata';
+import { QueryClient, QueryClientProvider } from 'react-query';
+
+import Autocomplete from './index.tsx';
+
+<Meta
+    title="Controls/ Form / Autocomplete"
+    component={Autocomplete}
+    decorators={[
+        StoryComponent => {
+            const queryClient = new QueryClient({
+                defaultOptions: {
+                    queries: {
+                        retry: 0,
+                        refetchOnWindowFocus: false,
+                    },
+                },
+            });
+            return (
+                <QueryClientProvider client={queryClient}>
+                    <StoryComponent />
+                </QueryClientProvider>
+            );
+        },
+    ]}
+/>
+
+# Search
+
+Обычный автокомплит, без привязки к форме
+
+<Story
+    name="Controls"
+    args={{
+        searchAsyncFunc: async inputValue => {
+            const waited = await wait();
+            if (waited) {
+                const filteredItems = mockSearchResultItems.filter(i =>
+                    i.label.toLowerCase().includes(inputValue.toLowerCase())
+                );
+                return filteredItems;
+            }
+            return [];
+        },
+    }}
+>
+    {args => (
+        <div style={{ width: '400px' }}>
+            <p style={{ marginBottom: '20px' }}>Введите "крупа"</p>
+            <Autocomplete {...args} />
+        </div>
+    )}
+</Story>
+
+## Props
+
+<ArgsTable story="Controls" />
+
+## Docs
+
+Компонент быстрого поиска. Реализован на downshift.
+
+В пропсы нужно передавать асинхронную ф-цию поиска searchAsyncFunc, которая возвращает данные в виде SearchItem[], описанного внутри компонента.
+
+В поиске по умолчанию настроен debounce и минимальная длина поисковой строки для начала поиска.
+
+## C формой предзаполненное
+
+<Canvas>
+    <Story
+        name="With Form with initial value"
+        args={{
+            searchAsyncFunc: async inputValue => {
+                const waited = await wait();
+                if (waited) {
+                    const filteredItems = mockSearchResultItems.filter(i =>
+                        i.label.toLowerCase().includes(inputValue.toLowerCase())
+                    );
+                    return filteredItems;
+                }
+                return mockSearchResultItems;
+            },
+        }}
+    >
+        {args => (
+            <div style={{ maxWidth: 400 }}>
+                <Form
+                    initialValues={{ search: { label: 'Крупа пшеничная', value: 'krupa-2' } }}
+                    onSubmit={values => alert(JSON.stringify(values))}
+                    validationSchema={Yup.object().shape({
+                        search: Yup.object().required('Выберите вариант из выпадающего списка'),
+                    })}
+                >
+                    <Form.Field name="search" label="Автокомплит" hint="Начните вводить 'крупа'">
+                        <Autocomplete {...args} />
+                    </Form.Field>
+                    <div style={{ display: 'flex', marginTop: 16 }}>
+                        <Button type="submit" style={{ marginRight: 16 }}>
+                            Отправить
+                        </Button>
+                        <Form.Reset theme="secondary">Сбросить</Form.Reset>
+                    </div>
+                </Form>
+            </div>
+        )}
+    </Story>
+</Canvas>
+
+## C формой пустое
+
+<Canvas>
+    <Story
+        name="With Form without initial walue"
+        args={{
+            searchAsyncFunc: async inputValue => {
+                const waited = await wait();
+                if (waited) {
+                    const filteredItems = mockSearchResultItems.filter(i =>
+                        i.label.toLowerCase().includes(inputValue.toLowerCase())
+                    );
+                    return filteredItems;
+                }
+                return mockSearchResultItems;
+            },
+        }}
+    >
+        {args => (
+            <div style={{ maxWidth: 400 }}>
+                <Form
+                    initialValues={{ search: null }}
+                    onSubmit={values => alert(JSON.stringify(values))}
+                    validationSchema={Yup.object().shape({
+                        search: Yup.object().required('Выберите вариант из выпадающего списка'),
+                    })}
+                >
+                    <Form.Field name="search" label="Автокомплит" hint="Начните вводить 'крупа'">
+                        <Autocomplete {...args} />
+                    </Form.Field>
+                    <div style={{ display: 'flex', marginTop: 16 }}>
+                        <Button type="submit" style={{ marginRight: 16 }}>
+                            Отправить
+                        </Button>
+                        <Form.Reset theme="secondary">Сбросить</Form.Reset>
+                    </div>
+                </Form>
+            </div>
+        )}
+    </Story>
+</Canvas>
+
+## Подсказка адреса
+
+Запрос адреса не работает в сторибуке, так как запрос должен слаться на домен и порт основного приложения, а в случае явного указания нужного адреса, натыкаемся на cors.
+Но оно работает.
+
+<Canvas>
+    <Story
+        name="With address suggestion"
+        args={{
+            searchAsyncFunc: async inputValue => {
+                const res = await getSuggestions(inputValue);
+                return res?.map(suggestion => ({ label: suggestion.value, value: suggestion })) || [];
+            },
+        }}
+    >
+        {args => (
+            <div style={{ maxWidth: 400 }}>
+                <Form
+                    initialValues={{ search: null }}
+                    onSubmit={values => alert(JSON.stringify(values))}
+                    validationSchema={Yup.object().shape({
+                        search: Yup.object().required('Выберите вариант из выпадающего списка'),
+                    })}
+                >
+                    <Form.Field name="search" label="Подсказки адреса" hint="Начните вводить адрес">
+                        <Autocomplete {...args} />
+                    </Form.Field>
+                    <div style={{ display: 'flex', marginTop: 16 }}>
+                        <Button type="submit" style={{ marginRight: 16 }}>
+                            Отправить
+                        </Button>
+                        <Form.Reset theme="secondary">Сбросить</Form.Reset>
+                    </div>
+                </Form>
+            </div>
+        )}
+    </Story>
+</Canvas>

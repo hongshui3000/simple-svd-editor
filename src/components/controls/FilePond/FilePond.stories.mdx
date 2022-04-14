@@ -1,0 +1,43 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import { FileTypes } from '@scripts/constants';
+import Form from '@components/controls/Form';
+import FilePond from './index';
+
+<Meta title="Controls / Deprecated / FilePond" component={FilePond} />
+
+# Controls
+
+!!! DEPRECATED !!! use Dropzone instead
+
+<Story name="Controls">
+    <div style={{ width: '600px' }}>
+        <Form initialValues={{ files: [] }} onSubmit={vals => alert(JSON.stringify(vals))}>
+            <Form.Field name="files" label="Label" hint="Small hint">
+                <FilePond acceptedFileTypes={FileTypes.PDF} />
+            </Form.Field>
+        </Form>
+    </div>
+</Story>
+
+Компонент FilePond работает на [filepond](https://pqina.nl/filepond/). Невероятно гибкий и мощный плагин для реализации инпутов типа file. Аналог Dropzone.
+
+Перед использованием настоятельно рекомендую внимательно посмотреть доступные настройки на оф. сайте.
+
+По умолчанию подключены плагины проверки типа и размера файлов, а также превью картинок. Через проп `allowReorder={true}` добавлено разрешение перестановки добавленных файликов мышкой, можно отключить.
+
+При интеграции потребуется прописать проп `server`. См. документацию.
+Если не указать пропсов `maxFileSize maxTotalFileSize maxFiles`, то плагин работать не будет, при этом не выводит никаких ошибок, поэтому заданы значения по умолчанию
+
+Список mime-type'ов файлов смотри [здесь](https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_MIME-%D1%82%D0%B8%D0%BF%D0%BE%D0%B2)
+
+## Use cases
+
+### Images Preview
+
+<Canvas>
+    <Story name="imagePreview">
+        <div style={{ width: '1000px' }}>
+            <FilePond imageLayout acceptedFileTypes={FileTypes.IMAGES} server="/api" />
+        </div>
+    </Story>
+</Canvas>

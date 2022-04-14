@@ -1,0 +1,39 @@
+import { Meta, Story, Canvas, ArgsTable } from '@storybook/addon-docs/blocks';
+import Badge from './index';
+
+<Meta title="Controls / Badge" component={Badge} />
+
+# Controls
+
+Компонент отображения статусов.
+
+<Story
+    name="Default"
+    args={{ text: 'В работе', type: 'warning' }}
+    argTypes={{
+        type: {
+            options: ['default', 'success', 'warning', 'error', 'created'],
+            control: { type: 'select' },
+        },
+    }}
+>
+    {args => <Badge {...args} />}
+</Story>
+
+<br />
+
+## Args Table
+
+<ArgsTable story="Default" />
+
+## Use Cases
+
+<Canvas>
+    <Story name="Use cases">
+        <Badge text="default" type="default" />
+        <Badge text="created" type="created" />
+        <Badge text="success" type="success" />
+        <Badge text="warning" type="warning" />
+        <Badge text="error" type="error" />
+    </Story>
+</Canvas>

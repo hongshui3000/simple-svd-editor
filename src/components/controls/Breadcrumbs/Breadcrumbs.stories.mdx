@@ -1,0 +1,25 @@
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import Breadcrumbs from '.';
+
+<Meta title="Controls / Breadcrumbs" component={Breadcrumbs} />
+
+# Breadcrumbs
+
+<Story name="Breadcrumbs">
+    <Breadcrumbs>
+        <Breadcrumbs.Item link="/" index="1">
+            Storybook
+        </Breadcrumbs.Item>
+        <Breadcrumbs.Item link="/" index="2">
+            GDS
+        </Breadcrumbs.Item>
+        <Breadcrumbs.Item link="/" index="3">
+            Breadcrumbs
+        </Breadcrumbs.Item>
+        <Breadcrumbs.Item index="4">Basic</Breadcrumbs.Item>
+    </Breadcrumbs>
+</Story>
+
+Спецификация: [WAI-ARIA](https://www.w3.org/TR/wai-aria-practices/#breadcrumb)
+
+Хлебные крошки представляют собой блок навигации с упорядоченным списком из ссылок. Последний элемент соответствует текущей странице и может не содержать ссылку.

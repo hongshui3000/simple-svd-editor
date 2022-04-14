@@ -1,0 +1,121 @@
+import { Meta, Story, Canvas, ArgsTable } from '@storybook/addon-docs/blocks';
+import { number } from '@storybook/addon-knobs';
+import { action } from '@storybook/addon-actions';
+import * as Yup from 'yup';
+import Legend from '@components/controls/Legend';
+import { Button, scale } from '@scripts/gds';
+import Form from '@components/controls/Form';
+import Textarea from '.';
+
+<Meta title="Controls / Form / Textarea" component={Textarea} />
+
+# Textarea
+
+<Story
+    name="Knobs"
+    args={{ minRows: 3, maxRows: 8 }}
+    argTypes={{ minRows: { control: 'range' }, maxRows: { control: 'range' } }}
+>
+    {args => (
+        <Form
+            initialValues={{ textarea: '' }}
+            validationSchema={Yup.object().shape({
+                textarea: Yup.string().required('Обязательное поле'),
+            })}
+            onSubmit={action('Submit')}
+            css={{ width: '25vw', minWidth: scale(40) }}
+        >
+            <Form.Field name="textarea">
+                <Legend label="Оставьте комментарий" />
+                <Textarea {...args} />
+            </Form.Field>
+            <br />
+            <Button type="submit">Submit</Button>
+        </Form>
+    )}
+</Story>
+
+Использует плагин: [react-textarea-autosize](https://github.com/andreypopp/react-textarea-autosize).
+
+`Textarea` - это не input, но по сути то же поле ввода, так что используется составной компонент `Form.Field`. Подробнее о составных компонентах смотри документацию `Form`.
+
+🥇 С точки зрения UX textarea должна визуально отличаться от обычного поля размерами, намекая на тот факт, что в это поле можно ввести развёрнутый комментарий. Так что рекомендуется выставлять `rows`, отличный от 1. По умолчанию выставлен 3.
+
+🥇 При реализации textarea один из важных возникающих вопросов - это реализация ограничения символов. Есть несколько подходов, но самым лучшим считается вывод оставшегося количества символов при приближении к границе - например, при достижении 10% снизу справа выводится 480/500. После выхода за пределы текст продолжает вводиться, но сообщение становится более явным (в т.ч. через live regions для AT), а валидация не даёт отправить такое значение.
+
+## Props
+
+<ArgsTable />
+
+## Use cases
+
+### Basic
+
+<Canvas>
+    <Story name="Basic">
+        <Form
+            initialValues={{ textarea: '' }}
+            validationSchema={Yup.object().shape({
+                textarea: Yup.string().required('Обязательное поле'),
+            })}
+            onSubmit={action('Submit')}
+            css={{ width: '25vw', minWidth: scale(40) }}
+        >
+            <Form.Field name="textarea">
+                <Legend label="Оставьте комментарий" />
+                <Textarea />
+            </Form.Field>
+            <br />
+            <Button type="submit">Submit</Button>
+        </Form>
+    </Story>
+</Canvas>
+
+### MaxLength
+
+<Canvas>
+    <Story name="MaxLength">
+        {() => {
+            const initialValues = {
+                textareaMax: '',
+            };
+            const maxLength = number('maxLength', 200, { min: 1 }, 'Props');
+            const threshold = number('threshold', 0, { min: 0, max: 100 }, 'Props');
+            const validationSchema = Yup.object().shape({
+                textareaMax: Yup.string().max(maxLength, 'Превышено кол-во символов').required('Обязательное поле'),
+            });
+            return (
+                <Form
+                    initialValues={initialValues}
+                    validationSchema={validationSchema}
+                    onSubmit={action('Submit')}
+                    style={{ width: '25vw', minWidth: '320px' }}
+                >
+                    <Form.Field name="textareaMax">
+                        <Legend label="Оставьте комментарий" />
+                        <Textarea maxLength={maxLength} threshold={threshold} />
+                    </Form.Field>
+                    <br />
+                    <Button type="submit">Submit</Button>
+                </Form>
+            );
+        }}
+    </Story>
+</Canvas>
+
+### MaxLength w/o Form
+
+<Canvas>
+    <Story name="Max Length without form">
+        {() => {
+            const maxLength = number('maxLength', 200, { min: 1 }, 'Props');
+            const threshold = number('threshold', 50, { min: 0, max: 100 }, 'Props');
+            return (
+                <div style={{ display: 'flex', flexDirection: 'column', minWidth: '320px' }}>
+                    <Legend name="max" label="Оставьте комментарий" />
+                    <Textarea id="max" maxLength={maxLength} threshold={threshold} />
+                </div>
+            );
+        }}
+    </Story>
+</Canvas>

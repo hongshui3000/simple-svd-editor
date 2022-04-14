@@ -1,0 +1,27 @@
+import { Meta, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+
+import Overlay from './index';
+
+<Meta title="Components / Overlay" component={Overlay} />
+
+# Overlay
+
+Компонент для отображения оверлея поверх всего. Ну почти :)
+
+<Story
+    name="Overlay"
+    args={{
+        active: true,
+    }}
+    argTypes={{
+        active: { description: 'Флаг состояния отображения оверлея' },
+    }}
+>
+    {args => <Overlay {...args} />}
+</Story>
+
+<br />
+
+## Args Table
+
+<ArgsTable story="Overlay" />

@@ -1,0 +1,37 @@
+import { Meta, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { text, boolean } from '@storybook/addon-knobs';
+import CheckboxGroup from '@components/controls/CheckboxGroup';
+import Checkbox from '@components/controls/Checkbox';
+
+<Meta title="Controls / Form / CheckboxGroup" component={CheckboxGroup} />
+
+# CheckboxGroup
+
+Компонент `CheckboxGroup` представляет собой обертку над группой чекбоксов, построенную через `fieldset`. Вся группа имеет единый `name` и каждый `item` имеет уникальный `value`. Результат представляется в виде массива из `value`.
+
+☝🏿 Т.к. используется `fieldset`, то разметка должна содержать `legend` - для этого предусмотрен обязательный проп `legend`. В идеале легенда должны быть видимой, но при необходимости её можно визуально скрыть, оставив доступной для AT, через проп `isHiddenLegend`.
+
+<Story name="CheckboxGroup" args={{ label: 'Выберите вариант', hint: 'Подсказка' }}>
+    {args => (
+        <CheckboxGroup name="checkbox-group" {...args}>
+            <Checkbox value="first" disabled={boolean('Disabled', false, 'Checkbox 1 props')}>
+                {text('Label', 'Вариант 1', 'Checkbox 1 props')}
+            </Checkbox>
+            <Checkbox value="second" disabled={boolean('Disabled', false, 'Checkbox 2 props')}>
+                {text('Label', 'Вариант 2', 'Checkbox 2 props')}
+            </Checkbox>
+            <Checkbox value="third" disabled={boolean('Disabled', false, 'Checkbox 3 props')}>
+                {text('Label', 'Вариант 3', 'Checkbox 3 props')}
+            </Checkbox>
+            <Checkbox value="fourth" disabled={boolean('Disabled', false, 'Checkbox 4 props')}>
+                {text('Label', 'Вариант 4', 'Checkbox 4 props')}
+            </Checkbox>
+        </CheckboxGroup>
+    )}
+</Story>
+
+<br />
+
+## Props
+
+<ArgsTable of={CheckboxGroup} story="CheckboxGroup" />

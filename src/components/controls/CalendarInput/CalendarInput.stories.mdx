@@ -1,0 +1,113 @@
+import { Meta, Story, ArgsTable, Canvas } from '@storybook/addon-docs/blocks';
+import Form from '@components/controls/Form';
+import { Button, scale } from '@scripts/gds';
+import * as Yup from 'yup';
+import { ErrorMessages } from '@scripts/constants';
+import CalendarInput from './index';
+
+<Meta title="Controls / Form / CalendarInput" component={CalendarInput} />
+
+# CalendarInput
+
+<Story name="basic">
+    {() => (
+        <div style={{ maxWidth: 450 }}>
+            <CalendarInput label="Инпут выбора даты" />
+        </div>
+    )}
+</Story>
+
+## Описание
+
+Самописный компонент календаря в связке с инпутом. [inspired by AlfaBank](https://alfa-laboratory.github.io/core-components/master/?path=/docs/%D0%BA%D0%BE%D0%BC%D0%BF%D0%BE%D0%BD%D0%B5%D0%BD%D1%82%D1%8B-calendar--calendar)
+
+## Props
+
+<ArgsTable />
+
+## Use cases
+
+### With form
+
+Для валидации поля нужно использовать метод tranform для исключения NaN, так как из-за типов не всегда можено занулить через undefined.
+
+<Canvas>
+    <Story name="with form">
+        <div style={{ maxWidth: 450, height: 400 }}>
+            <Form
+                initialValues={{ calendar: NaN }}
+                onSubmit={vals => alert(JSON.stringify(vals))}
+                validationSchema={Yup.object().shape({
+                    calendar: Yup.number()
+                        .transform(val => (Number.isNaN(val) ? undefined : val))
+                        .required(ErrorMessages.REQUIRED),
+                })}
+            >
+                <Form.Field name="calendar">
+                    <CalendarInput label="Инпут выбора даты" />
+                </Form.Field>
+                <br />
+                <div style={{ display: 'flex' }}>
+                    <Form.Reset style={{ marginRight: scale(2) }} theme="secondary">
+                        Сбросить
+                    </Form.Reset>
+                    <Button type="submit">Отправить</Button>
+                </div>
+            </Form>
+        </div>
+    </Story>
+</Canvas>
+
+### With form and default value
+
+<Canvas>
+    <Story name="with form and default value">
+        <div style={{ maxWidth: 450, height: 400 }}>
+            <Form
+                initialValues={{ calendar: 1621555200000 }}
+                onSubmit={vals => alert(JSON.stringify(vals))}
+                validationSchema={Yup.number()
+                    .transform(val => (Number.isNaN(val) ? undefined : val))
+                    .required(ErrorMessages.REQUIRED)}
+            >
+                <Form.Field name="calendar">
+                    <CalendarInput label="Инпут выбора даты со значением по умолчанию" />
+                </Form.Field>
+                <br />
+                <div style={{ display: 'flex' }}>
+                    <Form.Reset style={{ marginRight: scale(2) }} theme="secondary">
+                        Сбросить
+                    </Form.Reset>
+                    <Button type="submit">Отправить</Button>
+                </div>
+            </Form>
+        </div>
+    </Story>
+</Canvas>
+
+### Disabled
+
+<Canvas>
+    <Story name="disabled">
+        <div style={{ maxWidth: 450, height: 400 }}>
+            <Form
+                initialValues={{ calendar: 1621555200000 }}
+                onSubmit={vals => alert(JSON.stringify(vals))}
+                validationSchema={Yup.number()
+                    .transform(val => (Number.isNaN(val) ? undefined : val))
+                    .required(ErrorMessages.REQUIRED)}
+            >
+                <Form.Field name="calendar" disabled>
+                    <CalendarInput label="Disabled инпут" />
+                </Form.Field>
+                <br />
+                <div style={{ display: 'flex' }}>
+                    <Form.Reset style={{ marginRight: scale(2) }} theme="secondary">
+                        Сбросить
+                    </Form.Reset>
+                    <Button type="submit">Отправить</Button>
+                </div>
+            </Form>
+        </div>
+    </Story>
+</Canvas>

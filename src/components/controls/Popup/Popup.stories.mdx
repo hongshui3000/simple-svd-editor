@@ -1,0 +1,297 @@
+import { Meta, Story, Canvas, ArgsTable } from '@storybook/addon-docs/blocks';
+import { action } from '@storybook/addon-actions';
+import { useState } from 'react';
+import * as Yup from 'yup';
+
+import { Button, scale } from '@scripts/gds';
+import Form from '@components/controls/Form';
+import Modal from '@components/controls/Modal';
+import Popup from '.';
+import './styles.scss';
+
+<Meta title="Controls / Popup" component={Popup} />
+
+# Popup
+
+<Story
+    name="Controls"
+    args={{
+        title: 'Заголовок',
+        isCloseButton: true,
+        isFullscreen: false,
+        rightHanded: true,
+        leftHanded: false,
+        scrollInside: false,
+        popupCss: {},
+    }}
+    argTypes={{
+        popupCss: {
+            description: 'Стили обертки контента попапа, проп будет удален',
+        },
+    }}
+>
+    {args => {
+        const Example = () => {
+            const [isPopupOpen, setIsPopupOpen] = useState(false);
+            return (
+                <div>
+                    <Button onClick={() => setIsPopupOpen(true)}>Открыть попап</Button>
+                    <Popup isOpen={isPopupOpen} onRequestClose={() => setIsPopupOpen(false)} {...args}>
+                        <Popup.Body>
+                            <p>
+                                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Perspiciatis quae saepe
+                                provident autem ducimus voluptates eaque, cum reiciendis culpa excepturi, magnam maxime
+                                beatae quod exercitationem. Consequatur recusandae fuga adipisci eos.
+                            </p>
+                            <p>
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed in voluptates dolores!
+                                Voluptas quibusdam perspiciatis fugiat, perferendis nisi similique temporibus beatae
+                                deleniti. Commodi id nobis voluptatibus eligendi autem? In, voluptatibus.
+                            </p>
+                            <p>
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed in voluptates dolores!
+                                Voluptas quibusdam perspiciatis fugiat, perferendis nisi similique temporibus beatae
+                                deleniti. Commodi id nobis voluptatibus eligendi autem? In, voluptatibus.
+                            </p>
+                            <p>
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed in voluptates dolores!
+                                Voluptas quibusdam perspiciatis fugiat, perferendis nisi similique temporibus beatae
+                                deleniti. Commodi id nobis voluptatibus eligendi autem? In, voluptatibus.
+                            </p>
+                            <p>
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed in voluptates dolores!
+                                Voluptas quibusdam perspiciatis fugiat, perferendis nisi similique temporibus beatae
+                                deleniti. Commodi id nobis voluptatibus eligendi autem? In, voluptatibus.
+                            </p>
+                            <p>
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed in voluptates dolores!
+                                Voluptas quibusdam perspiciatis fugiat, perferendis nisi similique temporibus beatae
+                                deleniti. Commodi id nobis voluptatibus eligendi autem? In, voluptatibus.
+                            </p>
+                            <p>
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed in voluptates dolores!
+                                Voluptas quibusdam perspiciatis fugiat, perferendis nisi similique temporibus beatae
+                                deleniti. Commodi id nobis voluptatibus eligendi autem? In, voluptatibus.
+                            </p>
+                            <p>
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed in voluptates dolores!
+                                Voluptas quibusdam perspiciatis fugiat, perferendis nisi similique temporibus beatae
+                                deleniti. Commodi id nobis voluptatibus eligendi autem? In, voluptatibus.
+                            </p>
+                        </Popup.Body>
+                        <Popup.Footer>
+                            <Button onClick={() => setIsPopupOpen(false)}>Закрыть попап</Button>
+                            <Button theme="secondary">Хорошо</Button>
+                        </Popup.Footer>
+                    </Popup>
+                </div>
+            );
+        };
+        return <Example />;
+    }}
+</Story>
+
+## Props
+
+<ArgsTable story="Controls" />
+
+Низкоуровневый компонент, на котором строятся все попапы проекта. Включает в себя движок и базовую стилизацию.
+
+Использует плагин: [react-modal](http://reactcommunity.org/react-modal/)
+
+Спецификация: [WAI-ARIA](https://www.w3.org/TR/wai-aria-practices/#dialog_modal)
+
+Попапы полностью аксессабильны: реализован перенос фокуса внутрь попапа и обратно, focus trapping в рамках попапа, обработка Esc и клика по оверлею.
+
+Попап добавляется на уровне компонента. При этом он будет автоматически перенесён на уровень body через **Portals API**. Портал располагается в разметке на постоянной основе, условно рендерится только его содержимое.
+
+Компонент **Popup** вставляется в разметку без условного рендера. Показывается ли он на странице зависит от пропса **isOpen**, обрабатываемого через state.
+
+Для решения проблемы со скроллом подключен плагин [body-scroll-lock](https://github.com/willmcpo/body-scroll-lock).
+
+☝🏿 Чтобы протестировать работоспособность скролл лока на девайсах откройте сторис scroll lock в режиме **Canvas** и перейдите в полноэкранный режим. Это необходимо, т.к. плагин не работает внутри фрейма (а все сторисы вставляются через них).
+
+Попап и содержимое попапа - это разные сущности. **Popup** - это низкоуровневая обёртка, реализующая логику попапов и не несущая за собой никакой стилизации контента. В качестве содержимого может использоваться любой компонент или группа компонентов. Преимущество такого подхода в его гибкости и возможности применить code splitting для содержимого. Это отличный пример его применения, т.к. пользователь не видит попап при первичной загрузке, а появление его зависит от определённого триггера.
+
+Стили добавляются глобально в \_app.tsx и в стори в сторибуке. Это сделано умышленно, так как предыдущий подход, где стили добавлялись в `<Global />` через emotion, дублировал стили столько раз, сколько попапов на странице + последние перетирали стили первого.
+
+## Логика работы
+
+1. Для менеджмента фокуса и AT попапы выносятся через порталы на уровень body вне основного приложения (root). Эту работу делает **react-modal** за нас: производит установку фокуса на попап и обратно, организует focus trapping в рамках попапа и ставит aria-hidden на root.
+
+1. Класс popup имеет сам портал, т.к. для каждого попапа портал свой. Так при открытии вложенного попапа будет создан второй портал с содержимым вложенного попапа, а родительский попап останется на месте в своём отдельном портале.
+1. Внутри попапа 2 обёртки, предоставляемые **react-modal**: **overlay** и **content**. Overlay - растянут на вьюпорт через position: fixed, content - лежит внутри оверлея и может иметь любую высоту. При превышении контентом высоты вьюпорта внутри контента появляется скролл.
+1. При реализации попапов через структуру popup -> overlay -> content скролл возможен только на уровне контента. Для добавления скролла на уровне оверлея нужна дополнительная обёртка popup -> overlay -> wrapper -> content. Т.к. мы не можем влиять на структуру **react-modal**, то content должен быть создан вокруг children, а вместо contentClasses (react-modal className prop) использоваться классы wrapper. Так что теоретически при необходимости это реализуемо (но смысла в этом мало).
+1. Выравнивание контента по центру происходит через flex. При этом чтобы высокие попапы не резались по вьюпорту контенту добавлен max-height: '100%'. Это же правило заставляет работать overflow.
+
+## Use cases
+
+### Basic
+
+<Canvas>
+    <Story name="Basic">
+        {() => {
+            const Example = () => {
+                const [isPopupOpen, setIsPopupOpen] = useState(false);
+                return (
+                    <div>
+                        <Button onClick={() => setIsPopupOpen(true)}>Открыть попап</Button>
+                        <Popup isOpen={isPopupOpen} onRequestClose={() => setIsPopupOpen(false)} title="Заголовок">
+                            <Popup.Body>Контент</Popup.Body>
+                        </Popup>
+                    </div>
+                );
+            };
+            return <Example />;
+        }}
+    </Story>
+</Canvas>
+
+### Visually hidden title
+
+Если у попапа нет заголовка, то вместо **title** используется **contentLabel** для указания скрытого заголовка для скринридеров.
+
+<Canvas>
+    <Story name="Visually hidden title">
+        {() => {
+            const Example = () => {
+                const [isPopupOpen, setIsPopupOpen] = useState(false);
+                return (
+                    <div>
+                        <Button onClick={() => setIsPopupOpen(true)}>Открыть попап</Button>
+                        <Popup
+                            isOpen={isPopupOpen}
+                            onRequestClose={() => setIsPopupOpen(false)}
+                            contentLabel="Заголовок"
+                            isCloseBtn={false}
+                        >
+                            <Popup.Body>Контент</Popup.Body>
+                        </Popup>
+                    </div>
+                );
+            };
+            return <Example />;
+        }}
+    </Story>
+</Canvas>
+
+### Inner popup
+
+Вложенные попапы также поддерживаются.
+
+<Canvas>
+    <Story name="Inner popup">
+        {() => {
+            const Example = () => {
+                const [isPopupOpen, setIsPopupOpen] = useState(false);
+                const [isInnerPopupOpen, setIsInnerPopupOpen] = useState(false);
+                return (
+                    <div>
+                        <Button onClick={() => setIsPopupOpen(true)}>Открыть попап</Button>
+                        <Popup
+                            isOpen={isPopupOpen}
+                            onRequestClose={() => setIsPopupOpen(false)}
+                            id="outer-popup"
+                            title="Внешний попап"
+                        >
+                            <Popup.Body>Контент</Popup.Body>
+                            <Popup.Footer>
+                                <Button onClick={() => setIsInnerPopupOpen(true)}>Open inner popup</Button>
+                                <Popup
+                                    isOpen={isInnerPopupOpen}
+                                    onRequestClose={() => setIsInnerPopupOpen(false)}
+                                    id="inner-popup"
+                                    title="Вложенный попап"
+                                >
+                                    <Popup.Body>Контент</Popup.Body>
+                                </Popup>
+                            </Popup.Footer>
+                        </Popup>
+                    </div>
+                );
+            };
+            return <Example />;
+        }}
+    </Story>
+</Canvas>
+
+### With Form
+
+Для форм, во всю высоту нужно дополнительно прокидывать стили через проп css
+
+<Canvas>
+    <Story name="With Form">
+        {() => {
+            const Example = () => {
+                const [isOpen, setIsOpen] = useState(false);
+                const open = () => setIsOpen(true);
+                const close = () => setIsOpen(false);
+                return (
+                    <div>
+                        <Button onClick={open}>Открыть попап</Button>
+                        <Popup isOpen={isOpen} onRequestClose={close} title="Попап с формой" rightHanded>
+                            <Form
+                                onSubmit={action('submit')}
+                                initialValues={{ name: '' }}
+                                validationSchema={Yup.object().shape({
+                                    name: Yup.string().required('Обязательное поле'),
+                                })}
+                                css={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+                            >
+                                <Popup.Body>
+                                    <Form.FastField label="Ваше имя" name="name" />
+                                </Popup.Body>
+                                <Popup.Footer>
+                                    <Form.Reset onReset={close} theme="secondary">
+                                        Отменить
+                                    </Form.Reset>
+                                    <Button type="Submit">Хорошо</Button>
+                                </Popup.Footer>
+                            </Form>
+                        </Popup>
+                    </div>
+                );
+            };
+            return <Example />;
+        }}
+    </Story>
+</Canvas>
+
+### With modal
+
+Каждый компонент и подкомпонент принимает css проп. Дополнительные стили прописывать им. В сторибуке проп css почему-то плохо отрабатывает.
+
+<Canvas>
+    <Story name="With modal">
+        {() => {
+            const Example = () => {
+                const [isOpen, setIsOpen] = useState(false);
+                const open = () => setIsOpen(true);
+                const close = () => setIsOpen(false);
+                return (
+                    <div>
+                        <Button onClick={open}>Открыть попап</Button>
+                        <Popup
+                            isOpen={isOpen}
+                            onRequestClose={close}
+                            contentLabel="Заголовок"
+                            isCloseButton={false}
+                            popupCss={{ padding: `${scale(5, true)}px ${scale(2)}px` }}
+                        >
+                            <Modal icon title="Заголовок" theme="white" css={{ border: 'none' }}>
+                                Текст сообщения или реакт компонент
+                            </Modal>
+                            <Popup.Footer css={{ padding: 0, border: 'none' }}>
+                                <Button onClick={close} theme="dangerous">
+                                    Отменить
+                                </Button>
+                                <Button type="Submit">Хорошо</Button>
+                            </Popup.Footer>
+                        </Popup>
+                    </div>
+                );
+            };
+            return <Example />;
+        }}
+    </Story>
+</Canvas>

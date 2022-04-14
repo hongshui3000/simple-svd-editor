@@ -1,0 +1,16 @@
+import { Meta, Canvas, Story } from '@storybook/addon-docs/blocks';
+import LinksAutokit from '@components/Autokits/LinksAutokit';
+
+<Meta title="Autokits / Links" />
+
+# Links
+
+Для получения стилей ссылок используется хук useLinkCSS. В параметры прокидывается тип 'blue' по умолчанию 'grey' или 'black'.
+
+Для подчеркнутой ссылки нужно обернуть текст в спан.
+
+<Canvas>
+    <Story name="Links">
+        <LinksAutokit />
+    </Story>
+</Canvas>

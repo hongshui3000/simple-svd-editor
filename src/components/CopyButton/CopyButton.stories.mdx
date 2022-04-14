@@ -1,0 +1,25 @@
+import { Meta, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+
+import CopyButton from './index';
+
+<Meta title="Components / CopyButton" component={CopyButton} />
+
+# CopyButton
+
+<Story
+    name="CopyButton"
+    args={{
+        children: '12345',
+        timeout: 1000,
+    }}
+>
+    {args => <CopyButton {...args} />}
+</Story>
+
+Кнопка для копирования текстового содержимого.
+
+<br />
+
+## Args Table
+
+<ArgsTable story="CopyButton" />

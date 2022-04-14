@@ -1,0 +1,13 @@
+{
+    // Личный фигма-токен https://www.figma.com/developers/api#authentication
+    "figmaToken": "",
+    // Figma Id можно получить, открыв список проектов -> правый клик на проект -> "Copy Link" -> "figma.com/file/FIGMA_ID/project-name".
+    // Figma token - это секретный ключ, так что убедитесь, что файл конфигурации добавлен в .gitignore.
+    "figmaId": ""
+    // Директория для сохранения иконок
+    "iconsDir": "src/client/images/icons/tokens",
+    // Название страницы Figma c токенами
+    "page": "Tokens",
+    // Путь для сохранения tokens.json
+    "tokensDir": "public"
+}

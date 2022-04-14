@@ -1,0 +1,29 @@
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import Form from '@components/controls/Form';
+import { Button } from '@scripts/gds';
+import CalendarRange from './index';
+
+<Meta title="Controls / Form / CalendarRange" component={CalendarRange} />
+
+# CalendarRange
+
+<Story name="CalendarRange">
+    {() => (
+        <div style={{ maxWidth: 600 }}>
+            <Form initialValues={{ dateFrom: '', dateTo: '' }} onSubmit={vals => alert(JSON.stringify(vals))}>
+                <CalendarRange nameFrom="dateFrom" nameTo="dateTo" label="Выберите диапазон дат" />
+                <br />
+                <div style={{ display: 'flex', marginBottom: 40 }}>
+                    <Button type="submit" style={{ marginRight: 16 }}>
+                        Отправить
+                    </Button>{' '}
+                    <Form.Reset theme="secondary">Сбросить</Form.Reset>
+                </div>
+            </Form>
+        </div>
+    )}
+</Story>
+
+## Описание
+
+Выбор диапазона дат. Работает только с формиком. Пример использования в стори. Не нужно оборачивать в `<Form.Field />`

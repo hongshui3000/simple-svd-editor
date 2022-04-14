@@ -1,0 +1,61 @@
+$day-size: 36px;
+
+.left {
+    & .daysEnter {
+        transform: translateX($day-size);
+    }
+
+    & .daysEnterActive {
+        transform: translateX(0%);
+    }
+
+    & .daysExit {
+        transform: translateX(0%);
+    }
+
+    & .daysExitActive {
+        transform: translateX(calc(-1 * $day-size));
+    }
+}
+
+.right {
+    & .daysEnter {
+        transform: translateX(calc(-1 * $day-size));
+    }
+
+    & .daysEnterActive {
+        transform: translateX(0%);
+    }
+
+    & .daysExit {
+        transform: translateX(0%);
+    }
+
+    & .daysExitActive {
+        transform: translateX($day-size);
+    }
+}
+
+.daysEnter {
+    opacity: 0;
+    position: absolute;
+    left: 0;
+}
+
+.daysEnterActive {
+    opacity: 1;
+}
+
+.daysExit {
+    pointer-events: none;
+    opacity: 1;
+}
+
+.daysExitActive {
+    opacity: 0;
+}
+
+.daysEnterActive,
+.daysExitActive {
+    transition: opacity 300ms, transform 300ms;
+}

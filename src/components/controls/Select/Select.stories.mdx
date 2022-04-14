@@ -1,0 +1,147 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import { action } from '@storybook/addon-actions';
+import * as Yup from 'yup';
+import { Button, scale, baseTheme } from '@scripts/gds';
+import Form from '@components/controls/Form';
+import StarIcon from '@icons/star.svg';
+import Select from '.';
+
+<Meta title="Controls / Form / Select" component={Select} />
+
+# Select
+
+<Story
+    name="Controls"
+    args={{
+        label: 'Выберите вариант',
+        simple: false,
+        hint: 'Текст подсказки',
+        required: true,
+        placeholder: 'Выбери меня...',
+        heightProp: scale(4),
+        isLegend: true,
+        disabled: false,
+        items: [
+            { value: 'value1', label: 'Вариант 1' },
+            { value: 'value2', label: 'Вариант 2' },
+            { value: 'value3', label: 'Вариант 3' },
+            { value: 'value4', label: 'Вариант 4' },
+            { value: 'value5', label: 'Вариант 5' },
+            {
+                value: 'value6',
+                label: (
+                    <>
+                        <StarIcon style={{ marginRight: scale(1) }} fill={baseTheme.colors.brand} />
+                        <strong>Вариант 6</strong>
+                    </>
+                ),
+            },
+        ],
+    }}
+>
+    {args => (
+        <Form
+            initialValues={{ select: '' }}
+            validationSchema={Yup.object().shape({
+                select: Yup.string().required('Выберите вариант'),
+            })}
+            onSubmit={vals => alert(JSON.stringify(vals))}
+            style={{ width: 500 }}
+        >
+            <Form.Field name="select">
+                <Select onChange={action('onChange')} {...args} />
+            </Form.Field>
+            <br />
+            <Form.Reset theme="fill">Сбросить</Form.Reset>
+            <Button type="submit">Submit</Button>
+        </Form>
+    )}
+</Story>
+
+Использует плагин: [Downshift](https://github.com/downshift-js/downshift), а в частности [useCombobox](https://github.com/downshift-js/downshift/tree/master/src/hooks/useCombobox) и [useSelect](https://github.com/downshift-js/downshift/tree/master/src/hooks/useSelect).
+
+Спецификация: [WAI-ARIA](https://www.w3.org/TR/wai-aria-practices/#Listbox).
+
+`Select` представляет собой кастомный одиночный селект. Под кастомным понимается, что он вообще не использует тег select, который недоступен для гибкой стилизации, но т.к. он по всем пунктам соответствует спецификации, то можно не волноваться на этот счёт.
+
+Селекты построены на `downshift` - библиотеке Кента Доддса, в которой он воплотил все свои навыки React паттернов
+
+Кастомный рендер в React делается элементарно, т.к. мы можем в качестве label просто передать свой компонент. Можно **вообще всё** 😮
+
+Пропом simple регулируется какая логика будет реализовываться useSelect или useCombobox. useSelect реализует логику, аналогичную простому select'у. useCombobox позволяет фильтровать значения списка, сопоставляя с введенной строкой.
+По умолчанию simple = false
+
+☝🏿 Для реализации кастомного селекта должна использоваться кнопка, а с ней в отличие от инпута нельзя связываться через label, поэтому в качестве label используется div со связкой по aria-labelledby. При этом aria-атрибуты получаются через props getters из downshift, поэтому пришлось отказаться от обёртки в Form.Field и прописывать label напрямую (мы не можем получить эти пропсы снаружи).
+
+❗️ При передаче в item.label вместо строки компонента поиск идёт по value вместо label. Если у вас есть идея как получить текстовый контент компонента, то это был бы отличный pull request 😉
+
+## Use Cases
+
+### W/O search
+
+<Canvas>
+    <Story name="Without search">
+        <Form
+            initialValues={{ select: '' }}
+            validationSchema={Yup.object().shape({
+                select: Yup.string().required('Выберите вариант'),
+            })}
+            onSubmit={vals => alert(JSON.stringify(vals))}
+            style={{ width: 500 }}
+        >
+            <Form.Field name="select">
+                <Select
+                    simple
+                    label="Выберите вариант"
+                    hint="Текст подсказки"
+                    items={[
+                        { value: 'value1', label: 'Вариант 1' },
+                        { value: 'value2', label: 'Вариант 2' },
+                        { value: 'value3', label: 'Вариант 3' },
+                        { value: 'value4', label: 'Вариант 4' },
+                        { value: 'value5', label: 'Вариант 5' },
+                        {
+                            value: 'value6',
+                            label: (
+                                <>
+                                    <StarIcon
+                                        width={scale(3)}
+                                        height={scale(3)}
+                                        style={{ marginRight: scale(1) }}
+                                        fill={baseTheme.colors.brand}
+                                    />
+                                    <strong>Вариант 6</strong>
+                                </>
+                            ),
+                        },
+                    ]}
+                    onChange={action('onChange')}
+                />
+            </Form.Field>
+            <br />
+            <Form.Reset theme="fill">Сбросить</Form.Reset>
+            <Button type="submit">Submit</Button>
+        </Form>
+    </Story>
+</Canvas>
+
+### W/O form
+
+<Canvas>
+    <Story name="Without form">
+        <Select
+            simple
+            label="Выберите вариант"
+            hint="Текст подсказки"
+            items={[
+                { value: 'value1', label: 'Вариант 1' },
+                { value: 'value2', label: 'Вариант 2' },
+                { value: 'value3', label: 'Вариант 3' },
+                { value: 'value4', label: 'Вариант 4' },
+                { value: 'value5', label: 'Вариант 5' },
+            ]}
+            onChange={action('onChange')}
+            style={{ width: 500 }}
+        />
+    </Story>
+</Canvas>

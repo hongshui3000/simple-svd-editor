@@ -1,0 +1,152 @@
+import { Meta, Story, Canvas, ArgsTable } from '@storybook/addon-docs/blocks';
+import { useState } from 'react';
+import Media from 'react-media';
+import Accordion from '@components/controls/Accordion';
+import Tabs from '.';
+
+<Meta title="Controls / Tabs" component={Tabs} />
+
+# Tabs
+
+<Story name="Uncontrolled mode">
+    <Tabs defaultIndex={0}>
+        <Tabs.List>
+            <Tabs.Tab>Title 1</Tabs.Tab>
+            <Tabs.Tab>Title 2</Tabs.Tab>
+            <Tabs.Tab>Title 3</Tabs.Tab>
+            <Tabs.Tab count={1}>Title 4</Tabs.Tab>
+            <Tabs.Tab marker>Title 5</Tabs.Tab>
+            <Tabs.Tab disabled count={2}>
+                Title 6
+            </Tabs.Tab>
+            <Tabs.Tab disabled marker>
+                Title 7
+            </Tabs.Tab>
+        </Tabs.List>
+        <Tabs.Panel>Panel 1</Tabs.Panel>
+        <Tabs.Panel>Panel 2</Tabs.Panel>
+        <Tabs.Panel>Panel 3</Tabs.Panel>
+        <Tabs.Panel>Panel 4</Tabs.Panel>
+        <Tabs.Panel>Panel 5</Tabs.Panel>
+        <Tabs.Panel>Panel 6</Tabs.Panel>
+        <Tabs.Panel>Panel 7</Tabs.Panel>
+    </Tabs>
+</Story>
+
+Использует плагин: [react-tabs](https://github.com/reactjs/react-tabs).
+
+Спецификация: [WAI-ARIA](https://www.w3.org/TR/wai-aria-practices/#tabpanel)
+
+В отличие от аккордеонов, плагин для которых ограничивает возможность controlled mode, табы могут определяться в 2-х режимах: **uncontrolled** и **controlled**.
+
+В **uncontrolled** режиме просто указывается **defaultIndex** и можно подключиться к изменениям через **onSelect**, чтобы выполнить какое-то действие. Весь менеджмент стейтом делается плагином внутри, так что он недоступен для внешнего изменения.
+
+В **controlled** режиме управление стейтом ложится на пользователя, так что создаётся свой стейт через **useState**, а значение и сеттер передаются через **selectedIndex** и **onSelect** соответственно.
+
+В отличие от аккордеонов табы могут блокироваться. Делается это через указание пропса **disabled** нужному **Tabs.Tab**.
+
+☝🏿 При использовании табов на SSR нужно производить сброс счётчика для матчинга id между сервером и клиентом. Для этого производится вызов **resetIdCounter** (см. [документацию](https://github.com/reactjs/react-tabs#resetidcounter-void)).
+
+Если нужно, чтобы табы меняли урл и сохраняли значение открытой вкладке в урл, то исопльзуй хук useTabs (лежит в скриптах)
+
+## Props
+
+<ArgsTable components={{ Tabs, 'Tabs.List': Tabs.List, 'Tabs.Tab': Tabs.Tab, 'Tabs.Panel': Tabs.Panel }} />
+
+## Use cases
+
+### Controlled mode
+
+<Canvas>
+    <Story name="Controlled mode">
+        {() => {
+            const Example = () => {
+                const [selectedIndex, setSelectedIndex] = useState(0);
+                return (
+                    <Tabs selectedIndex={selectedIndex} onSelect={setSelectedIndex}>
+                        <Tabs.List>
+                            <Tabs.Tab>Title 1</Tabs.Tab>
+                            <Tabs.Tab>Title 2</Tabs.Tab>
+                            <Tabs.Tab disabled>Title 3</Tabs.Tab>
+                            <Tabs.Tab>Title 4</Tabs.Tab>
+                        </Tabs.List>
+                        <Tabs.Panel>Panel 1</Tabs.Panel>
+                        <Tabs.Panel>Panel 2</Tabs.Panel>
+                        <Tabs.Panel>Panel 3</Tabs.Panel>
+                        <Tabs.Panel>Panel 4</Tabs.Panel>
+                    </Tabs>
+                );
+            };
+            return <Example />;
+        }}
+    </Story>
+</Canvas>
+
+### Adaptive accordion
+
+Адаптивное перестроение из табов в аккордеон невозможно, но мы можем заменять один компонент на другой через **Media**, используя для компонентов единый стейт.
+
+Аккордеон при этом должен рендериться в режиме, запрещающем одновременное открытие нескольких табов или закрытие всех, т.к. дефолтное поведение противоречит логике работы табов.
+
+<Canvas>
+    <Story name="Adaptive accordion">
+        {() => {
+            const Example = () => {
+                const [selectedIndex, setSelectedIndex] = useState(0);
+                return (
+                    <Media query={{ maxWidth: 767 }}>
+                        {matches =>
+                            matches ? (
+                                <Accordion
+                                    preExpanded={[selectedIndex]}
+                                    onChange={ids => setSelectedIndex(ids[0])}
+                                    allowMultipleExpanded={false}
+                                    allowZeroExpanded={false}
+                                >
+                                    <Accordion.Item uuid={0}>
+                                        <Accordion.Heading>
+                                            <Accordion.Button>Title 1</Accordion.Button>
+                                        </Accordion.Heading>
+                                        <Accordion.Panel>Panel 1</Accordion.Panel>
+                                    </Accordion.Item>
+                                    <Accordion.Item uuid={1}>
+                                        <Accordion.Heading>
+                                            <Accordion.Button>Title 2</Accordion.Button>
+                                        </Accordion.Heading>
+                                        <Accordion.Panel>Panel 2</Accordion.Panel>
+                                    </Accordion.Item>
+                                    <Accordion.Item uuid={2}>
+                                        <Accordion.Heading>
+                                            <Accordion.Button>Title 3</Accordion.Button>
+                                        </Accordion.Heading>
+                                        <Accordion.Panel>Panel 3</Accordion.Panel>
+                                    </Accordion.Item>
+                                    <Accordion.Item uuid={3}>
+                                        <Accordion.Heading>
+                                            <Accordion.Button>Title 4</Accordion.Button>
+                                        </Accordion.Heading>
+                                        <Accordion.Panel>Panel 4</Accordion.Panel>
+                                    </Accordion.Item>
+                                </Accordion>
+                            ) : (
+                                <Tabs selectedIndex={selectedIndex} onSelect={setSelectedIndex}>
+                                    <Tabs.List>
+                                        <Tabs.Tab>Title 1</Tabs.Tab>
+                                        <Tabs.Tab>Title 2</Tabs.Tab>
+                                        <Tabs.Tab>Title 3</Tabs.Tab>
+                                        <Tabs.Tab>Title 4</Tabs.Tab>
+                                    </Tabs.List>
+                                    <Tabs.Panel>Panel 1</Tabs.Panel>
+                                    <Tabs.Panel>Panel 2</Tabs.Panel>
+                                    <Tabs.Panel>Panel 3</Tabs.Panel>
+                                    <Tabs.Panel>Panel 4</Tabs.Panel>
+                                </Tabs>
+                            )
+                        }
+                    </Media>
+                );
+            };
+            return <Example />;
+        }}
+    </Story>
+</Canvas>

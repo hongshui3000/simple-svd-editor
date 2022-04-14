@@ -1,0 +1,125 @@
+import { Meta, Story, Canvas, ArgsTable } from '@storybook/addon-docs/blocks';
+import { text, boolean, number } from '@storybook/addon-knobs';
+import { action } from '@storybook/addon-actions';
+import { Button, scale } from '@scripts/gds';
+import * as Yup from 'yup';
+import CheckboxGroup from '@components/controls/CheckboxGroup';
+import Form from '@components/controls/Form';
+import Switcher from '.';
+
+<Meta title="Controls / Form/ Switcher" component={Switcher} />
+
+# Switcher
+
+<Story name="Knobs">
+    {() => {
+        const maxItems = number('maxItems', 2, { min: 1 }, 'Props');
+        const initialValues = {
+            switcherKnobs: [],
+        };
+        const validationSchema = Yup.object().shape({
+            switcherKnobs: Yup.array().max(maxItems, 'Превышен лимит').required('Обязательное поле'),
+        });
+        return (
+            <Form
+                initialValues={initialValues}
+                validationSchema={validationSchema}
+                onSubmit={action('submit')}
+                css={{ width: '25vw', minWidth: scale(40) }}
+            >
+                <Form.Field name="switcherKnobs">
+                    <CheckboxGroup
+                        label={text('Legend', 'Выберите вариант', 'Props')}
+                        hint={text('Hint', 'Подсказка', 'Props')}
+                        isHiddenLegend={boolean('isHiddenLegend', false, 'Props')}
+                    >
+                        <Switcher
+                            value="switcher-1"
+                            disabled={boolean('Disabled', false, 'Switcher 1 props')}
+                            description={text('Description', '', 'Switcher 1 props')}
+                            css={{ marginBottom: scale(2) }}
+                        >
+                            {text('Label', 'Вариант 1', 'Switcher 1 props')}
+                        </Switcher>
+                        <Switcher
+                            value="switcher-2"
+                            disabled={boolean('Disabled', false, 'Switcher 2 props')}
+                            description={text('Description', '', 'Switcher 2 props')}
+                            css={{ marginBottom: scale(2) }}
+                        >
+                            {text('Label', 'Вариант 2', 'Switcher 2 props')}
+                        </Switcher>
+                        <Switcher
+                            value="switcher-3"
+                            disabled={boolean('Disabled', true, 'Switcher 3 props')}
+                            description={text('Description', '', 'Switcher 3 props')}
+                            css={{ marginBottom: scale(2) }}
+                        >
+                            {text('Label', 'Вариант 3', 'Switcher 3 props')}
+                        </Switcher>
+                        <Switcher
+                            value="switcher-4"
+                            disabled={boolean('Disabled', false, 'Switcher 4 props')}
+                            description={text('Description', '', 'Switcher 4 props')}
+                            css={{ marginBottom: scale(2) }}
+                        >
+                            {text('Label', 'Вариант 4', 'Switcher 4 props')}
+                        </Switcher>
+                        <Switcher
+                            value="switcher-5"
+                            disabled={boolean('Disabled', false, 'Switcher 5 props')}
+                            description={text('Description', 'Описание', 'Switcher 5 props')}
+                            css={{ marginBottom: scale(2) }}
+                        >
+                            {text('Label', 'Вариант 5 с описанием', 'Switcher 5 props')}
+                        </Switcher>
+                        <Switcher
+                            value="switcher-6"
+                            disabled={boolean('Disabled', false, 'Switcher 6 props')}
+                            description={text(
+                                'Description',
+                                'Описание тоже большое-пребольшое, чтобы проверить перенос строки',
+                                'Switcher 6 props'
+                            )}
+                            css={{ marginBottom: scale(2) }}
+                        >
+                            {text(
+                                'Label',
+                                'Вариант 6 с описанием и очень длинным label, который отлично переносится',
+                                'Switcher 6 props'
+                            )}
+                        </Switcher>
+                    </CheckboxGroup>
+                </Form.Field>
+                <br />
+                <Form.Reset theme="fill">Сбросить</Form.Reset>
+                <Button type="submit">Submit</Button>
+            </Form>
+        );
+    }}
+</Story>
+
+Компонент `Switcher` использует настоящий input type="checkbox", стилизация которого происходит через псевдоэлементы. Сам инпут визуально скрывается, а стилизуется label, где бокс - это ::before, марка - ::after. Это работает благодаря тому, что клик по label триггерит изменение инпута.
+
+## Props
+
+<ArgsTable />
+
+## Use case
+
+### With link
+
+<Canvas>
+    <Story name="With link">
+        <Switcher value="SwitcherLink">
+            <div>
+                Я прочитал и принимаю&#8201;
+                <a href="/" style={{ textDecoration: 'underline' }}>
+                    Пользовательское соглашение
+                </a>&#8201;и&#8201;<a href="/" style={{ textDecoration: 'underline' }}>
+                    Согласие на обработку персональных данных
+                </a>
+            </div>
+        </Switcher>
+    </Story>
+</Canvas>

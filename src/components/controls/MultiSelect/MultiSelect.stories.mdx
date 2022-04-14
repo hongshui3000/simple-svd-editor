@@ -1,0 +1,85 @@
+import { Meta, Story, Canvas } from '@storybook/addon-docs/blocks';
+import { action } from '@storybook/addon-actions';
+import * as Yup from 'yup';
+import { Button, scale, baseTheme } from '@scripts/gds';
+import Form from '@components/controls/Form';
+import StarIcon from '@icons/star.svg';
+import { ErrorMessages } from '@scripts/constants';
+import MultiSelect from '.';
+
+<Meta title="Controls / Form / MultiSelect" component={MultiSelect} />
+
+# MultiSelect
+
+<Story
+    name="With form and default value"
+    args={{
+        label: 'Выберите вариант',
+        hint: 'Текст подсказки',
+        required: true,
+        placeholder: 'Выбери меня...',
+        heightProp: scale(4),
+        disabled: false,
+        items: [
+            { value: 'value1', label: 'Вариант 1' },
+            { value: 'value2', label: 'Вариант 2' },
+            { value: 'value3', label: 'Вариант 3' },
+            { value: 'value4', label: 'Вариант 4' },
+            { value: 'value5', label: 'Вариант 5' },
+            {
+                value: 'value6',
+                label: (
+                    <>
+                        <StarIcon style={{ marginRight: scale(1) }} fill={baseTheme.colors.brand} />
+                        <strong>Вариант 6</strong>
+                    </>
+                ),
+            },
+        ],
+    }}
+>
+    {args => (
+        <Form
+            initialValues={{ select: ['value3'] }}
+            validationSchema={Yup.object().shape({
+                select: Yup.array().min(2, ErrorMessages.MIN_ITEMS(2)),
+            })}
+            onSubmit={action('form submit')}
+            style={{ width: 500 }}
+        >
+            <Form.Field name="select">
+                <MultiSelect onChange={action('onChange')} {...args} />
+            </Form.Field>
+            <br />
+            <Form.Reset theme="fill">Сбросить</Form.Reset>
+            <Button type="submit">Submit</Button>
+        </Form>
+    )}
+</Story>
+
+Компонент Мультиселекта построен на основе [downshift](https://www.downshift-js.com/use-multiple-selection).
+
+<Canvas>
+    <Story
+        name="Without form"
+        args={{
+            label: 'Выберите вариант',
+            hint: 'Текст подсказки',
+            required: true,
+            placeholder: 'Выбери меня...',
+            heightProp: scale(4),
+            disabled: false,
+            items: [
+                { value: 'value1', label: 'Вариант 1' },
+                { value: 'value2', label: 'Вариант 2' },
+                { value: 'value3', label: 'Вариант 3' },
+                { value: 'value4', label: 'Вариант 4' },
+                { value: 'value5', label: 'Вариант 5' },
+            ],
+            name: 'multiselect',
+            onChange: action('onChange'),
+        }}
+    >
+        {args => <MultiSelect {...args} />}
+    </Story>
+</Canvas>

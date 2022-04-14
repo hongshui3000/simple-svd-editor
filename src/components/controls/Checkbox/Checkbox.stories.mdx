@@ -1,0 +1,106 @@
+import { Meta, Story, Canvas, ArgsTable } from '@storybook/addon-docs/blocks';
+import { text, boolean, number } from '@storybook/addon-knobs';
+import { action } from '@storybook/addon-actions';
+import { Button, scale } from '@scripts/gds';
+import * as Yup from 'yup';
+import CheckboxGroup from '@components/controls/CheckboxGroup';
+import Form from '@components/controls/Form';
+import Checkbox from '.';
+
+<Meta title="Controls / Form / Checkbox" component={Checkbox} />
+
+# Checkbox
+
+<Story name="Knobs">
+    {() => {
+        const maxItems = number('maxItems', 3, { min: 1 }, 'Props');
+        const initialValues = {
+            checkboxKnobs: [],
+        };
+        const validationSchema = Yup.object().shape({
+            checkboxKnobs: Yup.array().max(maxItems, 'Превышен лимит').required('Обязательное поле'),
+        });
+        return (
+            <Form
+                initialValues={initialValues}
+                validationSchema={validationSchema}
+                onSubmit={action('Submit')}
+                css={{ width: '25vw', minWidth: scale(40) }}
+            >
+                <Form.Field name="checkboxKnobs">
+                    <CheckboxGroup
+                        label={text('Legend', 'Выберите вариант', 'Props')}
+                        hint={text('Hint', 'Подсказка', 'Props')}
+                        isHiddenLegend={boolean('isHiddenLegend', false, 'Props')}
+                    >
+                        <Checkbox value="first" disabled={boolean('Disabled', false, 'Checkbox 1 props')}>
+                            {text('Label', 'Вариант 1', 'Checkbox 1 props')}
+                        </Checkbox>
+                        <Checkbox value="second" disabled={boolean('Disabled', false, 'Checkbox 2 props')}>
+                            {text('Label', 'Вариант 2', 'Checkbox 2 props')}
+                        </Checkbox>
+                        <Checkbox value="third" disabled={boolean('Disabled', false, 'Checkbox 3 props')}>
+                            {text('Label', 'Вариант 3', 'Checkbox 3 props')}
+                        </Checkbox>
+                        <Checkbox value="fourth" disabled>
+                            {text('Label', 'Вариант 4', 'Checkbox 4 props')}
+                        </Checkbox>
+                    </CheckboxGroup>
+                </Form.Field>
+                <br />
+                <Button type="submit">Submit</Button>
+            </Form>
+        );
+    }}
+</Story>
+
+Компонент `Checkbox` использует настоящий input type="checkbox", стилизация которого происходит через псевдоэлементы. Сам инпут визуально скрывается, а стилизуется label, где бокс - это ::before, марка - ::after. Это работает благодаря тому, что клик по label триггерит изменение инпута.
+
+## Props
+
+<ArgsTable />
+
+## Use cases
+
+### Basic
+
+<Canvas>
+    <Story name="Basic">
+        <Form
+            initialValues={{ checkbox: [] }}
+            validationSchema={Yup.object().shape({
+                checkbox: Yup.array().required('Обязательное поле'),
+            })}
+            onSubmit={action('Submit')}
+            css={{ width: '25vw', minWidth: scale(40) }}
+        >
+            <Form.Field name="checkbox">
+                <CheckboxGroup label="Выберите вариант">
+                    <Checkbox value="first">Вариант 1</Checkbox>
+                    <Checkbox value="second">Вариант 2</Checkbox>
+                    <Checkbox value="third">Вариант 3</Checkbox>
+                    <Checkbox value="fourth">Вариант 4</Checkbox>
+                </CheckboxGroup>
+            </Form.Field>
+            <br />
+            <Button type="submit">Submit</Button>
+        </Form>
+    </Story>
+</Canvas>
+
+### With link
+
+<Canvas>
+    <Story name="With link">
+        <Checkbox name="checkboxLink">
+            Я прочитал и принимаю{' '}
+            <a href="/" style={{ textDecoration: 'underline' }}>
+                Пользовательское соглашение
+            </a>{' '}
+            и{' '}
+            <a href="/" style={{ textDecoration: 'underline' }}>
+                Согласие на обработку персональных данных
+            </a>
+        </Checkbox>
+    </Story>
+</Canvas>

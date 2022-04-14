@@ -1,0 +1,46 @@
+import { Meta, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { action } from '@storybook/addon-actions';
+import { Button } from '@scripts/gds';
+import * as Yup from 'yup';
+import Checkbox from '@components/controls/Checkbox';
+import CheckboxGroup from '@components/controls/CheckboxGroup';
+import Form from '@components/controls/Form';
+import CheckboxAnother from '.';
+
+<Meta title="Controls / Form / CheckboxAnother" component={CheckboxAnother} />
+
+# CheckboxAnother
+
+Компонент `CheckboxAnother` представляет собой отдельный вид чекбокса с дополнительным полем `textarea`, внутри которого происходит кастомное поведение данного типа чекбокса.
+
+❗️️ `CheckboxAnother` зависит от `formik`, поэтому обязательно надо оборачивать в Form.
+
+❗️️ `value` прокинутое в качестве пропса проставится к `textarea` как `name` следовательно, не надо забыть описать его в `yup`.
+
+<Story name="CheckboxAnother">
+    <Form
+        initialValues={{ checkboxAnother: [], another: '' }}
+        validationSchema={Yup.object().shape({
+            checkboxAnother: Yup.array().required('Обязательное поле'),
+            another: Yup.string(),
+        })}
+        onSubmit={action('Submit')}
+        style={{ width: '25vw', minWidth: '320px' }}
+    >
+        <Form.Field name="checkboxAnother">
+            <CheckboxGroup label="Выберите вариант">
+                <Checkbox value="first">Вариант 1</Checkbox>
+                <Checkbox value="second">Вариант 2</Checkbox>
+                <Checkbox value="third">Вариант 3</Checkbox>
+                <Checkbox value="fourth">Вариант 4</Checkbox>
+                <CheckboxAnother value="another">Другое: </CheckboxAnother>
+            </CheckboxGroup>
+        </Form.Field>
+        <br />
+        <Button type="submit">Submit</Button>
+    </Form>
+</Story>
+
+## Props
+
+<ArgsTable />
