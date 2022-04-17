@@ -22,7 +22,7 @@
     "dependencies": {
         "@emotion/core": "10.1.1",
         "@emotion/styled": "11.3.0",
-        "@greensight/gds": "2.3.0",
+        "@greensight/gds": "^2.4.1",
         "@next/bundle-analyzer": "10.2.3",
         "@storybook/addon-actions": "6.2.9",
         "@storybook/addon-docs": "6.2.9",

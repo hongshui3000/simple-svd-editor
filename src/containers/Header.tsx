@@ -2,8 +2,6 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { useQueryClient } from 'react-query';
 
-import { useCurrentUser } from '@api/auth';
-
 import Header from '@components/Header';
 
 import { preparedFlatMenu } from '@scripts/data/menu';
@@ -33,7 +31,6 @@ const HeaderContainer = ({ onLogout }: { onLogout: () => void }) => {
 
     const { setIsSidebarOpen, setIsOverlayOpen } = useCommon();
 
-    const { data: userData } = useCurrentUser();
     return (
         <Header
             breadcrumb={breadcrumb}
@@ -45,7 +42,6 @@ const HeaderContainer = ({ onLogout }: { onLogout: () => void }) => {
                 setIsSidebarOpen(true);
                 setIsOverlayOpen(true);
             }}
-            user={userData?.data}
             // onSearch={search => alert(`Поиск еще не реализован ${search}`)}
         />
     );

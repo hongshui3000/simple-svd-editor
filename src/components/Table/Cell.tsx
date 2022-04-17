@@ -23,7 +23,8 @@ export interface CellProps {
         | 'float'
         | 'enum'
         | 'bool'
-        | 'object';
+        | 'object'
+        | 'binary';
     value: any;
 }
 
@@ -33,6 +34,9 @@ export const Cell: FC<CellProps> = ({ value, type }) => {
 
     if (!value && type !== 'photo') return '-';
     switch (type) {
+        case 'binary':
+            return <p>0x{parseInt(value, 16).toString(16).padStart(8, '0')}</p>;
+
         case 'photo':
             return (
                 <div css={{ width: scale(6), height: scale(6), borderRadius: scale(1, true) }}>

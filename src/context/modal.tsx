@@ -13,7 +13,6 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { nanoid } from 'nanoid';
 import Modal, { ModalProps } from '@components/controls/Modal';
 import { Button, scale, useTheme } from '@scripts/gds';
-import { FetchError } from '@api/index';
 
 type ExtendedModal = ModalProps & { id: string | number; initedTime: number };
 export interface ModalContextProps {
@@ -137,13 +136,13 @@ export const useModalsContext = () => {
     return context;
 };
 
-export const useError = (err?: FetchError | null) => {
-    const { appendModal } = useModalsContext();
+// export const useError = (err?: FetchError | null) => {
+//     const { appendModal } = useModalsContext();
 
-    useEffect(() => {
-        if (err?.message || err?.code) appendModal({ title: err.code, message: err.message, theme: 'error' });
-    }, [err?.message, appendModal, err?.code]);
-};
+//     useEffect(() => {
+//         if (err?.message || err?.code) appendModal({ title: err.code, message: err.message, theme: 'error' });
+//     }, [err?.message, appendModal, err?.code]);
+// };
 
 export const useSuccess = (message: string) => {
     const { appendModal } = useModalsContext();
