@@ -8,6 +8,20 @@ import {
     getSettingsColumn,
 } from '@components/Table';
 import { scale } from '@scripts/gds';
+import { parseXML, SVDRootObject } from '@scripts/xml';
+
+const SVD_PATH =
+    'https://raw.githubusercontent.com/ARM-software/CMSIS/master/CMSIS/SVD/ARM_Example.svd';
+
+fetch(SVD_PATH)
+    .then(resp => resp.text())
+    .then(txt => {
+        const parsed = parseXML<SVDRootObject>(txt);
+        const { peripherals } = parsed.device;
+        console.log('Peripherals:', peripherals);
+        console.log('p0 registers:', peripherals.peripheral.map(e => e.registers)[0]);
+        console.log('p0 reg0 fields', peripherals.peripheral[0].registers.register[0].fields.field)
+    });
 
 const cols: ExtendedColumn[] = [
     getSelectColumn(),
