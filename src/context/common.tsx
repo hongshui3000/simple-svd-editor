@@ -1,5 +1,5 @@
-import { parseXML, SVDRootObject } from '@scripts/xml';
 import { CommonComponentDataProps } from '@scripts/getTotalPageData';
+import { SVDRootObject } from '@scripts/xml';
 import {
     useContext,
     createContext,
@@ -23,9 +23,7 @@ export const CommonProvider: FC<{
     state: CommonComponentDataProps;
     children: ReactNode | ReactNodeArray;
 }> = ({ state, children }) => {
-    const [xmlData, setXmlData] = useState<SVDRootObject | null>(
-        parseXML<SVDRootObject>(state.xmlData)
-    );
+    const [xmlData, setXmlData] = useState<SVDRootObject | null>(state.xmlData);
 
     return (
         <CommonContext.Provider

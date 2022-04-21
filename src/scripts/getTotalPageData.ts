@@ -1,9 +1,10 @@
 import { getXML } from '@api/xml/api';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { QueryClient } from 'react-query';
+import { parseXML, SVDRootObject } from './xml';
 
 export interface CommonComponentDataProps {
-    xmlData: string;
+    xmlData: SVDRootObject | null;
 }
 
 export interface TotalPageDataProps {
@@ -24,7 +25,7 @@ const getTotalPageData = async ({ queryClient }: TotalPageDataProps) => {
     const xmlData = queryClient.getQueryData<string>(keyXml);
 
     const commonData: CommonComponentDataProps = {
-        xmlData: xmlData || '',
+        xmlData: xmlData ? parseXML(xmlData) : null,
     };
 
     return {

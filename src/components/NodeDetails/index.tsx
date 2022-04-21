@@ -1,9 +1,9 @@
-import { Column } from 'react-table';
-import { Data } from '@components/Table/types';
-import { FC, HTMLProps, useMemo } from 'react';
 import Table, { TableHeader } from '@components/Table';
-import { scale, typography } from '@scripts/gds';
+import { Data } from '@components/Table/types';
 import Form from '@components/controls/Form';
+import { scale, typography } from '@scripts/gds';
+import { FC, HTMLProps, useMemo } from 'react';
+import { Column } from 'react-table';
 import { NodeField, NodeFieldProps } from './Field';
 
 export interface NodeDetailsProps extends HTMLProps<HTMLDivElement> {
@@ -26,7 +26,13 @@ export const NodeDetails: FC<NodeDetailsProps> = ({
     const initialValues = useMemo(
         () =>
             nodeFields.reduce((data, field) => {
-                const val = field.type === 'array' ? field.initialValue : field.value;
+                let val = field.value;
+                if (field.type === 'array') val = field.initialValue;
+                if (field.type === 'nested' && Array.isArray(field.value))
+                    val = field.value.reduce((obj, subData) => {
+                        obj[subData.name] = subData.value;
+                        return obj;
+                    }, {});
                 return { ...data, [field.name]: val || '' };
             }, {}),
         [nodeFields]

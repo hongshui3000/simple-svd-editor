@@ -1,3 +1,4 @@
+import { ContentBtnProps } from '@components/controls/Tooltip';
 import { ReactNode } from 'react';
 import {
     Row,
@@ -8,7 +9,6 @@ import {
     Column,
     TableOptions,
 } from 'react-table';
-import { ContentBtnProps } from '@components/controls/Tooltip';
 
 export type Data = Record<string, any> & { id: string | number; string?: string };
 

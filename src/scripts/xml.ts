@@ -2,6 +2,10 @@ import { XMLParser, XMLBuilder } from 'fast-xml-parser';
 
 const parser = new XMLParser({
     allowBooleanAttributes: true,
+    numberParseOptions: {
+        hex: false,
+        leadingZeros: true,
+    },
     // ignoreAttributes: false,
     // attributeNamePrefix: '@_',
 });

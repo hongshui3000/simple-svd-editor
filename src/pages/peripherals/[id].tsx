@@ -10,60 +10,20 @@ import {
     getSelectColumn,
     getSettingsColumn,
 } from '@components/Table';
+import Mask from '@components/controls/Mask';
+import Tooltip, { ContentBtn } from '@components/controls/Tooltip';
 import { useCommon } from '@context/common';
 import { ACCESS_TYPE_OPTIONS } from '@scripts/constants';
+import { scale } from '@scripts/gds';
 import getTotalPageData, {
     SVD_PATH,
     TotalPageDataProps,
 } from '@scripts/getTotalPageData';
 import { Peripheral } from '@scripts/xml';
 import { useRouter } from 'next/router';
-import { useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { dehydrate, QueryClient } from 'react-query';
-
-const childrenCols: ExtendedColumn[] = [
-    getSelectColumn(),
-    {
-        Header: 'ID',
-        accessor: 'id',
-    },
-    {
-        Header: 'Название',
-        accessor: 'name',
-        Cell: props => <Cell type="string" {...props} />,
-        // disableSortBy: true,
-    },
-    {
-        Header: 'Описание',
-        accessor: 'description',
-    },
-    {
-        Header: 'Смещ. адреса',
-        accessor: 'addressOffset',
-        Cell: props => <Cell type="binary" {...props} />,
-    },
-    {
-        Header: 'Размер',
-        accessor: 'size',
-        Cell: props => <Cell type="int" {...props} />,
-    },
-    {
-        Header: 'Доступ',
-        accessor: 'access',
-        Cell: props => <Cell type="enum" {...props} />,
-    },
-    {
-        Header: 'Нач. значение',
-        accessor: 'resetValue',
-        Cell: props => <Cell type="binary" {...props} />,
-    },
-    {
-        Header: 'Нач. маска',
-        accessor: 'resetMask',
-        Cell: props => <Cell type="binary" {...props} />,
-    },
-    getSettingsColumn(),
-];
+import { followCursor } from 'tippy.js';
 
 type PartialRecord<K extends keyof any, T> = Partial<Record<K, T>>;
 type ExtendedFieldProps = Partial<NodeFieldProps> & {
@@ -84,7 +44,6 @@ const EDITABLE_FIELDS: PartialRecord<keyof Peripheral, ExtendedFieldProps> = {
     baseAddress: {
         label: 'Баз. адрес',
         type: 'binary',
-        valueFunction: value => (value ? `0x${value}` : ''),
     },
     groupName: { label: 'Название группы', type: 'string' },
     resetMask: {
@@ -120,7 +79,7 @@ const ControllerNode = () => {
         query: { id },
     } = useRouter();
     const parsedId = +`${id}`;
-    const { xmlData } = useCommon();
+    const { xmlData, setXmlData } = useCommon();
 
     const fields = useMemo(() => {
         const peripherals = xmlData?.device?.peripherals?.peripheral
@@ -137,42 +96,31 @@ const ControllerNode = () => {
         ) => ({
             name: key,
             value: initialFieldProps.initialValue || '',
-            ...(svdData && {
-                value: svdData,
-            }),
+            ...(svdData !== undefined &&
+                svdData !== null && {
+                    value: svdData,
+                }),
             ...initialFieldProps,
             ...(initialFieldProps.valueFunction && {
                 value: initialFieldProps.valueFunction(svdData),
             }),
         });
 
-        return entries
-            .map<NodeFieldProps | null>(entry => {
-                const key = entry[0];
+        return entries.map<NodeFieldProps>(entry => {
+            const key = entry[0];
 
-                const svdData = peripheral?.[key];
-                const initialFieldProps = entry[1];
-                const res = convert(key, svdData, initialFieldProps);
-                if (initialFieldProps.type === 'nested') {
-                    console.log(
-                        'key',
-                        key,
-                        'peripheral',
-                        peripheral,
-                        'svdData',
-                        svdData,
-                        'initial',
-                        initialFieldProps
-                    );
-                    res.value = res.value.map((e: any) =>
-                        convert(e.name, (svdData as any)[e.name], e)
-                    );
-                }
+            const svdData = peripheral?.[key];
+            const initialFieldProps = entry[1];
+            const res = convert(key, svdData, initialFieldProps);
+            if (initialFieldProps.type === 'nested') {
+                res.value = res.value.map((e: any) =>
+                    convert(e.name, (svdData as any)[e.name], e)
+                );
+            }
 
-                delete res.valueFunction;
-                return res;
-            })
-            .filter(Boolean) as NodeFieldProps[];
+            delete res.valueFunction;
+            return res as NodeFieldProps;
+        });
     }, [parsedId, xmlData]);
 
     // console.log(fields);
@@ -183,17 +131,168 @@ const ControllerNode = () => {
         if (!device.peripherals) return [];
         const { peripheral } = device.peripherals;
 
+        console.log(peripheral[0]);
+
         return peripheral.map<Data>((p, i) => ({
             id: i,
             name: p.name,
             description: p.description,
-            addressOffset: `0x${p.baseAddress}`,
+            addressOffset: p.baseAddress,
             size: p.size,
             access: p.access,
             resetValue: p.resetValue,
             resetMask: p.resetMask,
         }));
     }, [xmlData]);
+
+    const pasteToColumn = useCallback(
+        (col: keyof Peripheral, val: any) => {
+            setXmlData({
+                ...xmlData!,
+                device: {
+                    ...xmlData!.device,
+                    peripherals: {
+                        peripheral: xmlData!.device.peripherals!.peripheral.map(e => ({
+                            ...e,
+                            [col]: val,
+                        })),
+                    },
+                },
+            });
+        },
+        [setXmlData, xmlData]
+    );
+
+    const childrenCols: ExtendedColumn[] = useMemo(
+        () => [
+            getSelectColumn(),
+            {
+                Header: 'ID',
+                accessor: 'id',
+            },
+            {
+                Header: 'Название',
+                accessor: 'name',
+                Cell: props => <Cell type="string" {...props} />,
+                // disableSortBy: true,
+            },
+            {
+                Header: 'Описание',
+                accessor: 'description',
+            },
+            {
+                Header: (/* {  data, column } */) => {
+                    const [visible, setVisible] = useState(false);
+                    const [copyVal, setCopyVal] = useState('');
+
+                    const getTooltipContent = () => (
+                        <>
+                            <Mask
+                                mask="\0x00000000"
+                                field={{
+                                    value: copyVal,
+                                    name: 'copy-val',
+                                    onChange: () => {},
+                                    onBlur: () => {},
+                                }}
+                                helpers={{
+                                    setValue: setCopyVal,
+                                    setError: () => {},
+                                    setTouched: () => {},
+                                }}
+                            />
+                            <ul>
+                                <li>
+                                    <ContentBtn
+                                        type="edit"
+                                        onClick={e => {
+                                            e.stopPropagation();
+
+                                            pasteToColumn('baseAddress', copyVal);
+
+                                            setVisible(false);
+                                        }}
+                                    >
+                                        Вставить
+                                    </ContentBtn>
+                                </li>
+                            </ul>
+                        </>
+                    );
+
+                    useEffect(() => {
+                        const callback = (e: KeyboardEvent) => {
+                            if (e.key === 'Escape') setVisible(false);
+                        };
+                        if (visible) {
+                            document.addEventListener('keydown', callback);
+                        }
+                        return () => {
+                            document.removeEventListener('keydown', callback);
+                        };
+                    }, [setVisible, visible]);
+
+                    return (
+                        <>
+                            <Tooltip
+                                content={getTooltipContent()}
+                                plugins={[followCursor]}
+                                followCursor="initial"
+                                arrow
+                                theme="light"
+                                placement="bottom"
+                                minWidth={scale(36)}
+                                appendTo={() => document.body}
+                                visible={visible}
+                                onClickOutside={() => setVisible(false)}
+                            >
+                                <button
+                                    type="button"
+                                    onContextMenu={e => {
+                                        e.preventDefault();
+                                        setVisible(true);
+                                    }}
+                                >
+                                    Смещ. адреса
+                                </button>
+                            </Tooltip>
+                        </>
+                    );
+                },
+                accessor: 'addressOffset',
+                Cell: props => <Cell type="binary" {...props} />,
+            },
+            {
+                Header: ({ data }) => (
+                    <button
+                        type="button"
+                        onDoubleClick={() => alert(`copied!${JSON.stringify(data)}`)}
+                    >
+                        Размер
+                    </button>
+                ),
+                accessor: 'size',
+                Cell: props => <Cell type="int" {...props} />,
+            },
+            {
+                Header: 'Доступ',
+                accessor: 'access',
+                Cell: props => <Cell type="enum" {...props} />,
+            },
+            {
+                Header: 'Нач. значение',
+                accessor: 'resetValue',
+                Cell: props => <Cell type="binary" {...props} />,
+            },
+            {
+                Header: 'Нач. маска',
+                accessor: 'resetMask',
+                Cell: props => <Cell type="binary" {...props} />,
+            },
+            getSettingsColumn(),
+        ],
+        [pasteToColumn]
+    );
 
     return (
         <NodeDetails

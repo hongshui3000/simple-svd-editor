@@ -5,8 +5,11 @@ import Mask from '@components/controls/Mask';
 import Select, { SelectItemProps } from '@components/controls/Select';
 import Textarea from '@components/controls/Textarea';
 import { CSSObject } from '@emotion/core';
-
-import { scale /* useTheme */, typography } from '@scripts/gds';
+import {
+    scale,
+    /* useTheme */
+    typography,
+} from '@scripts/gds';
 
 export interface NodeFieldProps extends Omit<FormFieldProps, 'value' | 'css'> {
     type: 'string' | 'number' | 'array' | 'binary' | 'textarea' | 'nested';
@@ -27,7 +30,6 @@ export const NodeField = ({
     delete props.initialValue;
 
     if (type === 'nested' && Array.isArray(value)) {
-        console.log('nodefield with', value);
         return (
             <div>
                 <h4
@@ -42,7 +44,7 @@ export const NodeField = ({
                         key={`${name}_${subField.name}`}
                         {...subField}
                         readOnly={readOnly}
-                        name={`${name}_${subField.name}`}
+                        name={`${name}.${subField.name}`}
                         className={`${subField.className} ${props.className || ''}`}
                     />
                 ))}

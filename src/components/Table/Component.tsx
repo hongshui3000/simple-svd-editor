@@ -1,8 +1,16 @@
-import { FC, useEffect, useMemo } from 'react';
-import { useTable, useRowSelect, useExpanded, PluginHook, useSortBy, useColumnOrder } from 'react-table';
-
-import { useRouter } from 'next/router';
 import { useLocalStorage } from '@scripts/hooks';
+import { useRouter } from 'next/router';
+import { FC, useEffect, useMemo } from 'react';
+import {
+    useTable,
+    useRowSelect,
+    useExpanded,
+    PluginHook,
+    useSortBy,
+    useColumnOrder,
+} from 'react-table';
+import { RowProvider } from './RowContext';
+import { TableRow } from './TableRow';
 import {
     TableProps,
     ExtendedUseTableInstanceProps,
@@ -12,8 +20,6 @@ import {
     Data,
 } from './types';
 import { StyledHeadCell, SortingIcon } from './utils';
-import { TableRow } from './TableRow';
-import { RowProvider } from './RowContext';
 
 /** api принимает строку в случае ascending и строку с минусом в случае descending  */
 const getSortedId = (columnId: string | undefined, desc?: boolean) =>
@@ -91,7 +97,8 @@ const Table: FC<TableProps> = ({
 
     // Set  sorting arrow in column header if needed
     useEffect(() => {
-        if (initialSortBy) setSortBy([{ id: initialSortBy, desc: isDescSort(initialSortBy) }]);
+        if (initialSortBy)
+            setSortBy([{ id: initialSortBy, desc: isDescSort(initialSortBy) }]);
     }, [initialSortBy, setSortBy]);
 
     // on sorting change callback calling
@@ -119,17 +126,26 @@ const Table: FC<TableProps> = ({
                         <thead>
                             {headerGroups.map(headerGroup => (
                                 <tr {...headerGroup.getHeaderGroupProps()}>
-                                    {headerGroup.headers.map((column: ExtendedHeaderGroup) => (
-                                        <StyledHeadCell
-                                            {...column.getHeaderProps(
-                                                column?.getSortByToggleProps && column?.getSortByToggleProps()
-                                            )}
-                                            key={column.id}
-                                        >
-                                            {column.render('Header')}
-                                            {column?.isSorted && <SortingIcon isSortedDesc={column?.isSortedDesc} />}
-                                        </StyledHeadCell>
-                                    ))}
+                                    {headerGroup.headers.map(
+                                        (column: ExtendedHeaderGroup) => (
+                                            <StyledHeadCell
+                                                {...column.getHeaderProps({
+                                                    ...(column?.getSortByToggleProps &&
+                                                        column?.getSortByToggleProps()),
+                                                })}
+                                                key={column.id}
+                                            >
+                                                {column.render('Header')}
+                                                {column?.isSorted && (
+                                                    <SortingIcon
+                                                        isSortedDesc={
+                                                            column?.isSortedDesc
+                                                        }
+                                                    />
+                                                )}
+                                            </StyledHeadCell>
+                                        )
+                                    )}
                                 </tr>
                             ))}
                         </thead>
