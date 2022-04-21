@@ -1,23 +1,39 @@
-import { useContext, createContext, ReactNode, ReactNodeArray, Dispatch, SetStateAction, useState, FC } from 'react';
-
-type IsOpen = boolean;
+import { parseXML, SVDRootObject } from '@scripts/xml';
+import { CommonComponentDataProps } from '@scripts/getTotalPageData';
+import {
+    useContext,
+    createContext,
+    ReactNode,
+    ReactNodeArray,
+    Dispatch,
+    SetStateAction,
+    useState,
+    FC,
+} from 'react';
 
 export interface CommonContextProps {
-    isSidebarOpen: IsOpen;
-    setIsSidebarOpen: Dispatch<SetStateAction<IsOpen>>;
-    isOverlayOpen: IsOpen;
-    setIsOverlayOpen: Dispatch<SetStateAction<IsOpen>>;
+    xmlData: SVDRootObject | null;
+    setXmlData: Dispatch<SetStateAction<SVDRootObject | null>>;
 }
 
 const CommonContext = createContext<CommonContextProps | null>(null);
 CommonContext.displayName = 'CommonContext';
 
-export const CommonProvider: FC<{ children: ReactNode | ReactNodeArray }> = ({ children }) => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+export const CommonProvider: FC<{
+    state: CommonComponentDataProps;
+    children: ReactNode | ReactNodeArray;
+}> = ({ state, children }) => {
+    const [xmlData, setXmlData] = useState<SVDRootObject | null>(
+        parseXML<SVDRootObject>(state.xmlData)
+    );
 
     return (
-        <CommonContext.Provider value={{ isSidebarOpen, setIsSidebarOpen, isOverlayOpen, setIsOverlayOpen }}>
+        <CommonContext.Provider
+            value={{
+                xmlData,
+                setXmlData,
+            }}
+        >
             {children}
         </CommonContext.Provider>
     );

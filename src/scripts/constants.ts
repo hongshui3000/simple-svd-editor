@@ -1,10 +1,19 @@
 import { declOfNum } from '@scripts/helpers';
+import { Access } from './enums';
 
 export const MAX_AGE_NEVER = 2 ** 31 - 1;
 
 export const MAX_STRING_SIZE = 40;
 
-export const DAYS = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
+export const DAYS = [
+    'Понедельник',
+    'Вторник',
+    'Среда',
+    'Четверг',
+    'Пятница',
+    'Суббота',
+    'Воскресенье',
+];
 
 export const HttpCode = {
     OK: 200,
@@ -44,9 +53,12 @@ export const ErrorMessages = {
     LESS_OR_EQUAL: 'Введите число меньше или равное',
     WRONG_FORMAT: 'Некорретные значения',
     ARRAY: 'Выберите хотя бы одно значение',
-    MIN_SYMBOLS: (num: number) => `Минимум ${num} ${declOfNum(num, ['символ', 'символа', 'символов'])}`,
-    MIN_ITEMS: (num: number) => `Выберите минимум ${num} ${declOfNum(num, ['значение', 'значения', 'значений'])}`,
-    MIN_FILES: (num: number) => `Выберите минимум ${num} ${declOfNum(num, ['файл', 'файла', 'файлов'])}`,
+    MIN_SYMBOLS: (num: number) =>
+        `Минимум ${num} ${declOfNum(num, ['символ', 'символа', 'символов'])}`,
+    MIN_ITEMS: (num: number) =>
+        `Выберите минимум ${num} ${declOfNum(num, ['значение', 'значения', 'значений'])}`,
+    MIN_FILES: (num: number) =>
+        `Выберите минимум ${num} ${declOfNum(num, ['файл', 'файла', 'файлов'])}`,
 };
 
 export const ModalMessages = {
@@ -64,3 +76,8 @@ export const FileTypes = {
 export const CREATE_PARAM = 'create';
 
 export const DEFAULT_TIMEZONE = 'Europe/Moscow';
+
+export const ACCESS_TYPE_OPTIONS = Object.entries(Access).map(e => ({
+    value: e[1],
+    label: e[1],
+}));

@@ -1,6 +1,7 @@
 import { ParsedUrlQuery } from 'querystring';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import getConfig from 'next/config';
 
 import { LIMIT_PAGE, KOPECKS_IN_ROUBLE } from './constants';
 
@@ -206,4 +207,24 @@ export const isNotEmptyObject = (obj: any) => {
         return Object.keys(obj).some(key => typeof obj[key] !== 'undefined');
     }
     throw new Error('Not an object parameter');
+};
+
+export const getHost = (): string => {
+    const { publicRuntimeConfig } = getConfig();
+    if (
+        publicRuntimeConfig.environment === 'localhost' &&
+        typeof window !== 'undefined'
+    ) {
+        return '';
+    }
+    const host = publicRuntimeConfig.apiHost;
+    if (!host) {
+        return '';
+    }
+
+    if (host.slice(-1) === '/') {
+        return host.slice(0, host.length - 1);
+    }
+
+    return host;
 };

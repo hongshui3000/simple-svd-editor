@@ -21,13 +21,12 @@ export const NodeDetails: FC<NodeDetailsProps> = ({
     childrenFields,
     childrenData,
     readOnly = false,
-    labelWidth = scale(12),
     ...props
 }) => {
     const initialValues = useMemo(
         () =>
             nodeFields.reduce((data, field) => {
-                const val = field.type === 'array' ? field.defaultValue : field.value;
+                const val = field.type === 'array' ? field.initialValue : field.value;
                 return { ...data, [field.name]: val || '' };
             }, {}),
         [nodeFields]
@@ -43,27 +42,22 @@ export const NodeDetails: FC<NodeDetailsProps> = ({
                     console.log(vals);
                 }}
                 css={{
-                    maxWidth: '70%',
+                    maxWidth: '75%',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(2, 1fr)',
+                    columnGap: scale(2),
                 }}
             >
                 {nodeFields.map(field => (
-                    <div
-                        css={{
-                            marginTop: scale(2),
-                        }}
+                    <NodeField
                         key={field.name}
-                    >
-                        <NodeField
-                            {...field}
-                            readOnly={readOnly}
-                            className={field.className}
-                            css={{
-                                display: 'grid',
-                                gridTemplateColumns: `${labelWidth}px 1fr`,
-                                alignItems: 'start',
-                            }}
-                        />
-                    </div>
+                        {...field}
+                        readOnly={readOnly}
+                        className={field.className}
+                        css={{
+                            marginBottom: scale(2),
+                        }}
+                    />
                 ))}
             </Form>
             <Table

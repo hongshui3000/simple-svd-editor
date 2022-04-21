@@ -89,6 +89,8 @@ export interface Peripheral {
     access: string;
     addressBlock: AddressBlock;
     interrupt: Interrupt;
+    resetValue: number;
+    resetMask: number;
     registers: Registers;
 }
 
@@ -111,7 +113,7 @@ export interface Device {
     access: string;
     resetValue: number;
     resetMask: number;
-    peripherals: Peripherals;
+    peripherals?: Peripherals;
 }
 
 export interface SVDRootObject {

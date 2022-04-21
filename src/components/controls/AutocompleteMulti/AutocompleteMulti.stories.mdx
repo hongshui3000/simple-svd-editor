@@ -1,0 +1,78 @@
+import { action } from '@storybook/addon-actions';
+import { ArgsTable, Meta, Story } from '@storybook/addon-docs/blocks';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import Form from '@components/controls/Form';
+import { Button } from '@scripts/gds';
+import AutocompleteMulti from './index.tsx';
+
+<Meta
+    title="Controls/ Form / AutocompleteMulti"
+    component={AutocompleteMulti}
+    decorators={[
+        StoryComponent => {
+            const queryClient = new QueryClient({
+                defaultOptions: {
+                    queries: {
+                        retry: 0,
+                        refetchOnWindowFocus: false,
+                    },
+                },
+            });
+            return (
+                <QueryClientProvider client={queryClient}>
+                    <StoryComponent />
+                </QueryClientProvider>
+            );
+        },
+    ]}
+/>
+
+# AutocompleteMulti
+
+<Story
+    name="Controls"
+    args={{
+        url: 'customers/customer-enum-values:search',
+        label: 'Автокомплит',
+        minInputLength: 0,
+    }}
+>
+    {args => (
+        <div style={{ width: '400px' }}>
+            <Form
+                initialValues={{
+                    search: [
+                        { value: '1', label: 'Вариант 1' },
+                        { value: '2', label: 'Вариант 2' },
+                    ],
+                }}
+                onSubmit={action('submit')}
+            >
+                <Form.Field name="search">
+                    <AutocompleteMulti {...args} />
+                </Form.Field>
+                <br />
+                <Form.Reset type="button" theme="secondary">
+                    Сбросить
+                </Form.Reset>
+                <Button type="submit">Отправить</Button>
+                <br />
+            </Form>
+        </div>
+    )}
+</Story>
+
+## Props
+
+<ArgsTable story="Controls" />
+
+## Docs
+
+Компонент быстрого поиска c множественным выбором. Реализован на базе компонента Multiselect + react-query, что значит, что ранее выполненные запросы кешируются. По-умолчанию, в компоненте реализован debounce.
+Некоторые особенности:
+
+-   В values формы сохраняется и label и value для каждого выбранного пункта. Это необходимо, чтобы при наличии initialValues не нужно было делать запросы на получение текста выбранного пункта;
+-   В пропсы достаточно передать относительный url;
+-   Компонент должен быть обернут в форму;
+-   В сторибуке запросы не ходят, поэтому в ответе будет ошибка;
+-   Запрос можно сделтать не куда угодно, а только по адресу основного апи. Посчитал это достаточным для нашего приложения. Если же нет, то в принципе компонент легко кастомизируется.

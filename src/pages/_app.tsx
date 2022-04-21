@@ -25,7 +25,7 @@ const AppContent: FC<AppProps> = ({ Component, pageProps }) => (
 );
 function MyApp(props: AppProps) {
     return (
-        <AppProviders>
+        <AppProviders {...props}>
             <AppContent {...props} />
         </AppProviders>
     );

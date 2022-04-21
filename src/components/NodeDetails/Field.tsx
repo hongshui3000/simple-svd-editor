@@ -1,15 +1,17 @@
 import Form from '@components/controls/Form';
 import { FormFieldProps } from '@components/controls/Form/Field';
 import Legend from '@components/controls/Legend';
+import Mask from '@components/controls/Mask';
 import Select, { SelectItemProps } from '@components/controls/Select';
+import Textarea from '@components/controls/Textarea';
 import { CSSObject } from '@emotion/core';
 
-import { scale /* useTheme */ } from '@scripts/gds';
+import { scale /* useTheme */, typography } from '@scripts/gds';
 
 export interface NodeFieldProps extends Omit<FormFieldProps, 'value' | 'css'> {
-    type: 'string' | 'number' | 'array';
-    value: string | number | SelectItemProps[];
-    defaultValue?: any;
+    type: 'string' | 'number' | 'array' | 'binary' | 'textarea' | 'nested';
+    value: string | number | any[];
+    initialValue?: any;
     fieldCSS?: CSSObject;
 }
 
@@ -22,6 +24,31 @@ export const NodeField = ({
     ...props
 }: NodeFieldProps) => {
     // const { colors } = useTheme();
+    delete props.initialValue;
+
+    if (type === 'nested' && Array.isArray(value)) {
+        console.log('nodefield with', value);
+        return (
+            <div>
+                <h4
+                    css={{
+                        ...typography('h3'),
+                    }}
+                >
+                    {props.label}
+                </h4>
+                {(value as NodeFieldProps[]).map(subField => (
+                    <NodeField
+                        key={`${name}_${subField.name}`}
+                        {...subField}
+                        readOnly={readOnly}
+                        name={`${name}_${subField.name}`}
+                        className={`${subField.className} ${props.className || ''}`}
+                    />
+                ))}
+            </div>
+        );
+    }
 
     switch (type) {
         case 'array':
@@ -69,7 +96,7 @@ export const NodeField = ({
         case 'string':
         case 'number':
             return (
-                <p>
+                <>
                     {!readOnly && (
                         <Form.Field
                             {...props}
@@ -86,7 +113,50 @@ export const NodeField = ({
                             {value}
                         </div>
                     )}
-                </p>
+                </>
+            );
+
+        case 'textarea':
+            return (
+                <>
+                    {!readOnly && (
+                        <Form.Field
+                            {...props}
+                            name={name}
+                            css={{
+                                ...fieldCSS,
+                            }}
+                        >
+                            <Textarea />
+                        </Form.Field>
+                    )}
+                    {readOnly && (
+                        <div className={props.className} css={{ ...fieldCSS }}>
+                            <Legend label={props.label} />
+                            {value}
+                        </div>
+                    )}
+                </>
+            );
+
+        case 'binary':
+            return (
+                <>
+                    {!readOnly && (
+                        <Form.Field
+                            {...props}
+                            name={name}
+                            css={{
+                                ...fieldCSS,
+                            }}
+                        >
+                            <Mask mask="\0x00000000" />
+                        </Form.Field>
+                    )}
+                    {readOnly && (
+                        <p>0x{parseInt(`${value}`, 16).toString(16).padStart(8, '0')}</p>
+                    )}
+                </>
             );
 
         // case 'enum': {
