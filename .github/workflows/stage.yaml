@@ -6,6 +6,7 @@ on:
     paths-ignore:
       - '**.md'
 env:
+  PORT: 3001
   copy-to: /var/www/svd-editor
   pm2_home: /var/www
 
@@ -32,7 +33,7 @@ jobs:
       - name: Create .env file
         run: |
           cat << EOF >> .env
-          PORT=3001
+          PORT=${{ env.PORT }}
           NODE_ENV=production
           GA_TRACKING_ID=${{ secrets.GA_TRACKING_ID }}
           EOF
@@ -41,7 +42,7 @@ jobs:
           CI: true
 
   deploy:
-    runs-on: [self-hosted, prod]
+    runs-on: [self-hosted, voenka-test]
 
     needs: build
 
