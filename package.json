@@ -39,6 +39,7 @@
         "date-fns": "2.22.1",
         "debounce": "1.2.1",
         "deepmerge": "4.2.2",
+        "dotenv": "^16.0.0",
         "downshift": "6.1.7",
         "emotion-rgba": "0.0.9",
         "fast-deep-equal": "3.1.3",
