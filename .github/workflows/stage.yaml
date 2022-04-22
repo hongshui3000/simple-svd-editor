@@ -32,6 +32,7 @@ jobs:
       - name: Create .env file
         run: |
           cat << EOF >> .env
+          PORT=3001
           NODE_ENV=production
           GA_TRACKING_ID=${{ secrets.GA_TRACKING_ID }}
           EOF
