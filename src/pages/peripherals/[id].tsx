@@ -249,6 +249,7 @@ const ControllerNode = () => {
                                 <button
                                     type="button"
                                     onContextMenu={e => {
+                                        console.log('set visible because of click');
                                         e.preventDefault();
                                         setVisible(true);
                                     }}
