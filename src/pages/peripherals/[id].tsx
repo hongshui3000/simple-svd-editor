@@ -98,29 +98,37 @@ const ControllerNode = () => {
             value: initialFieldProps.initialValue || '',
             ...(svdData !== undefined &&
                 svdData !== null && {
-                    value: svdData,
-                }),
+                value: svdData,
+            }),
             ...initialFieldProps,
             ...(initialFieldProps.valueFunction && {
                 value: initialFieldProps.valueFunction(svdData),
             }),
         });
 
-        return entries.map<NodeFieldProps>(entry => {
+        return entries.map<NodeFieldProps | null>(entry => {
             const key = entry[0];
 
             const svdData = peripheral?.[key];
+
+            console.log('svdData:', svdData);
+
+            if (!svdData) {
+                return null;
+            }
+
             const initialFieldProps = entry[1];
             const res = convert(key, svdData, initialFieldProps);
             if (initialFieldProps.type === 'nested') {
-                res.value = res.value.map((e: any) =>
-                    convert(e.name, (svdData as any)[e.name], e)
-                );
+                res.value = res.value.map((e: any) => {
+                    console.log('e=', e, 'svdData=', svdData);
+                    return convert(e.name, (svdData as any)[e.name], e);
+                });
             }
 
             delete res.valueFunction;
             return res as NodeFieldProps;
-        });
+        }).filter(Boolean) as NodeFieldProps[];
     }, [parsedId, xmlData]);
 
     // console.log(fields);
@@ -131,13 +139,11 @@ const ControllerNode = () => {
         if (!device.peripherals) return [];
         const { peripheral } = device.peripherals;
 
-        console.log(peripheral[0]);
-
         return peripheral.map<Data>((p, i) => ({
             id: i,
             name: p.name,
             description: p.description,
-            addressOffset: p.baseAddress,
+            baseAddress: p.baseAddress,
             size: p.size,
             access: p.access,
             resetValue: p.resetValue,
@@ -192,13 +198,13 @@ const ControllerNode = () => {
                                 field={{
                                     value: copyVal,
                                     name: 'copy-val',
-                                    onChange: () => {},
-                                    onBlur: () => {},
+                                    onChange: () => { },
+                                    onBlur: () => { },
                                 }}
                                 helpers={{
                                     setValue: setCopyVal,
-                                    setError: () => {},
-                                    setTouched: () => {},
+                                    setError: () => { },
+                                    setTouched: () => { },
                                 }}
                             />
                             <ul>
@@ -260,7 +266,7 @@ const ControllerNode = () => {
                         </>
                     );
                 },
-                accessor: 'addressOffset',
+                accessor: 'baseAddress',
                 Cell: props => <Cell type="binary" {...props} />,
             },
             {
