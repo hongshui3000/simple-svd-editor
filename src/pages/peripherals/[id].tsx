@@ -10,20 +10,17 @@ import {
     getSelectColumn,
     getSettingsColumn,
 } from '@components/Table';
-import Mask from '@components/controls/Mask';
-import Tooltip, { ContentBtn } from '@components/controls/Tooltip';
 import { useCommon } from '@context/common';
 import { ACCESS_TYPE_OPTIONS } from '@scripts/constants';
-import { scale } from '@scripts/gds';
 import getTotalPageData, {
     SVD_PATH,
     TotalPageDataProps,
 } from '@scripts/getTotalPageData';
 import { Peripheral } from '@scripts/xml';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { dehydrate, QueryClient } from 'react-query';
-import { followCursor } from 'tippy.js';
+import { getCopyableColumn } from '@components/Table/columns/getCopyableColumn';
 
 type PartialRecord<K extends keyof any, T> = Partial<Record<K, T>>;
 type ExtendedFieldProps = Partial<NodeFieldProps> & {
@@ -152,7 +149,9 @@ const ControllerNode = () => {
     }, [xmlData]);
 
     const pasteToColumn = useCallback(
-        (col: keyof Peripheral, val: any) => {
+        (col: string, val: any) => {
+            const column = col as keyof Peripheral;
+
             setXmlData({
                 ...xmlData!,
                 device: {
@@ -160,7 +159,7 @@ const ControllerNode = () => {
                     peripherals: {
                         peripheral: xmlData!.device.peripherals!.peripheral.map(e => ({
                             ...e,
-                            [col]: val,
+                            [column]: val,
                         })),
                     },
                 },
@@ -186,89 +185,20 @@ const ControllerNode = () => {
                 Header: 'Описание',
                 accessor: 'description',
             },
-            {
-                Header: (/* {  data, column } */) => {
-                    const [visible, setVisible] = useState(false);
-                    const [copyVal, setCopyVal] = useState('');
-
-                    const getTooltipContent = () => (
-                        <>
-                            <Mask
-                                mask="\0x00000000"
-                                field={{
-                                    value: copyVal,
-                                    name: 'copy-val',
-                                    onChange: () => { },
-                                    onBlur: () => { },
-                                }}
-                                helpers={{
-                                    setValue: setCopyVal,
-                                    setError: () => { },
-                                    setTouched: () => { },
-                                }}
-                            />
-                            <ul>
-                                <li>
-                                    <ContentBtn
-                                        type="edit"
-                                        onClick={e => {
-                                            e.stopPropagation();
-
-                                            pasteToColumn('baseAddress', copyVal);
-
-                                            setVisible(false);
-                                        }}
-                                    >
-                                        Вставить
-                                    </ContentBtn>
-                                </li>
-                            </ul>
-                        </>
-                    );
-
-                    useEffect(() => {
-                        const callback = (e: KeyboardEvent) => {
-                            if (e.key === 'Escape') setVisible(false);
-                        };
-                        if (visible) {
-                            document.addEventListener('keydown', callback);
-                        }
-                        return () => {
-                            document.removeEventListener('keydown', callback);
-                        };
-                    }, [setVisible, visible]);
-
-                    return (
-                        <>
-                            <Tooltip
-                                content={getTooltipContent()}
-                                plugins={[followCursor]}
-                                followCursor="initial"
-                                arrow
-                                theme="light"
-                                placement="bottom"
-                                minWidth={scale(36)}
-                                appendTo={() => document.body}
-                                visible={visible}
-                                onClickOutside={() => setVisible(false)}
-                            >
-                                <button
-                                    type="button"
-                                    onContextMenu={e => {
-                                        console.log('set visible because of click');
-                                        e.preventDefault();
-                                        setVisible(true);
-                                    }}
-                                >
-                                    Смещ. адреса
-                                </button>
-                            </Tooltip>
-                        </>
-                    );
-                },
+            getCopyableColumn({
                 accessor: 'baseAddress',
-                Cell: props => <Cell type="binary" {...props} />,
-            },
+                Header: 'Смещ. адреса',
+                type: 'binary',
+                cellType: 'binary',
+                pasteToColumn,
+            }),
+            getCopyableColumn({
+                accessor: 'size',
+                Header: 'Размер',
+                type: 'number',
+                cellType: 'int',
+                pasteToColumn,
+            }),
             {
                 Header: ({ data }) => (
                     <button

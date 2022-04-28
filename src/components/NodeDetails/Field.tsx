@@ -16,7 +16,8 @@ export interface NodeFieldProps extends Omit<FormFieldProps, 'value' | 'css'> {
     value: string | number | any[];
     initialValue?: any;
     fieldCSS?: CSSObject;
-}
+    
+};
 
 export const NodeField = ({
     name,
