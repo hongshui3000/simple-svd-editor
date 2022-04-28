@@ -1,3 +1,4 @@
+import Form from "@components/controls/Form";
 import Tooltip, { ContentBtn } from "@components/controls/Tooltip";
 import { NodeField, NodeFieldProps } from "@components/NodeDetails/Field";
 import { scale } from '@scripts/gds';
@@ -26,12 +27,14 @@ export const getCopyableColumn = ({
 
         const getTooltipContent = () => (
             <>
-                <NodeField
-                    name="copy-val"
-                    type={type}
-                    value={copyVal}
-                    onChange={e => { setCopyVal(e.currentTarget.value) }}
-                />
+                <Form initialValues={{copyVal, }} onSubmit={() => {}}>
+                    <NodeField
+                        name="copyVal"
+                        type={type}
+                        value={copyVal}
+                        onChange={e => { setCopyVal(e.currentTarget.value) }}
+                    />
+                </Form>
                 <ul>
                     <li>
                         <ContentBtn
