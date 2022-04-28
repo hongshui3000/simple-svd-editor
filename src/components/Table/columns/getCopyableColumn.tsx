@@ -1,6 +1,6 @@
 import Tooltip, { ContentBtn } from "@components/controls/Tooltip";
 import { NodeField, NodeFieldProps } from "@components/NodeDetails/Field";
-import { scale } from "@greensight/gds/types/src";
+import { scale } from '@scripts/gds';
 import { useEffect, useState } from "react";
 import { followCursor } from "tippy.js";
 import { Cell, CellProps } from "../Cell";
