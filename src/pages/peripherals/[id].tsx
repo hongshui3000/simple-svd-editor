@@ -200,27 +200,17 @@ const ControllerNode = () => {
                 pasteToColumn,
             }),
             {
-                Header: ({ data }) => (
-                    <button
-                        type="button"
-                        onDoubleClick={() => alert(`copied!${JSON.stringify(data)}`)}
-                    >
-                        Размер
-                    </button>
-                ),
-                accessor: 'size',
-                Cell: props => <Cell type="int" {...props} />,
-            },
-            {
                 Header: 'Доступ',
                 accessor: 'access',
                 Cell: props => <Cell type="enum" {...props} />,
             },
-            {
-                Header: 'Нач. значение',
+            getCopyableColumn({
                 accessor: 'resetValue',
-                Cell: props => <Cell type="binary" {...props} />,
-            },
+                Header: 'Нач. значение',
+                type: 'binary',
+                cellType: 'binary',
+                pasteToColumn,
+            }),
             {
                 Header: 'Нач. маска',
                 accessor: 'resetMask',

@@ -1,7 +1,7 @@
 import Form from "@components/controls/Form";
-import Tooltip, { ContentBtn } from "@components/controls/Tooltip";
+import Tooltip from "@components/controls/Tooltip";
 import { NodeField, NodeFieldProps } from "@components/NodeDetails/Field";
-import { scale } from '@scripts/gds';
+import { Button, scale } from '@scripts/gds';
 import { useEffect, useState } from "react";
 import { followCursor } from "tippy.js";
 import { Cell, CellProps } from "../Cell";
@@ -23,34 +23,40 @@ export const getCopyableColumn = ({
     accessor,
     Header: (/* {  data, column } */) => {
         const [visible, setVisible] = useState(false);
-        const [copyVal, setCopyVal] = useState('');
 
         const getTooltipContent = () => (
             <>
-                <Form initialValues={{copyVal, }} onSubmit={() => {}}>
+                <Form initialValues={{ copyVal: '' }} onSubmit={(vals) => {
+                    pasteToColumn(accessor, vals.copyVal);
+
+                    setVisible(false);
+                }} css={{
+                    padding: '0 8px',
+                }}>
                     <NodeField
+                        label="Клонируемое значение"
                         name="copyVal"
+                        value=""
                         type={type}
-                        value={copyVal}
-                        onChange={e => { setCopyVal(e.currentTarget.value) }}
                     />
+                    <Button type="submit" css={{ marginTop: scale(2) }}>Вставить</Button>
+                    {/* <ul>
+                        <li>
+                            <ContentBtn
+                                type="edit"
+                                onClick={e => {
+                                    e.stopPropagation();
+
+                                    pasteToColumn(accessor, copyVal);
+
+                                    setVisible(false);
+                                }}
+                            >
+                                Вставить
+                            </ContentBtn>
+                        </li>
+                    </ul> */}
                 </Form>
-                <ul>
-                    <li>
-                        <ContentBtn
-                            type="edit"
-                            onClick={e => {
-                                e.stopPropagation();
-
-                                pasteToColumn(accessor, copyVal);
-
-                                setVisible(false);
-                            }}
-                        >
-                            Вставить
-                        </ContentBtn>
-                    </li>
-                </ul>
             </>
         );
 
