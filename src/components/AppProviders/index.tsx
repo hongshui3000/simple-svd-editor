@@ -1,12 +1,13 @@
-import { ReactNode, useState } from 'react';
-import { Hydrate, QueryClientProvider, QueryClient } from 'react-query';
-import { ReactQueryDevtools } from 'react-query/devtools';
-import { ThemeProvider, theme } from '@scripts/gds';
-
-import { ModalProvider } from '@context/modal';
-import { CommonProvider } from '@context/common';
-import { STALE_TIME } from '@scripts/constants';
 import { AppProps } from 'next/app';
+import { ReactNode, useState } from 'react';
+import { Hydrate, QueryClient, QueryClientProvider } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
+
+import { CommonProvider } from '@context/common';
+import { ModalProvider } from '@context/modal';
+
+import { STALE_TIME } from '@scripts/constants';
+import { ThemeProvider, theme } from '@scripts/gds';
 
 interface AppProvidersProps extends AppProps {
     children: ReactNode;

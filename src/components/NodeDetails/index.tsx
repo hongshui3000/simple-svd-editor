@@ -1,28 +1,78 @@
+import { FormikProps } from 'formik';
+import { HTMLProps, useEffect, useMemo } from 'react';
+import { Column } from 'react-table';
+
 import Table, { TableHeader } from '@components/Table';
 import { Data } from '@components/Table/types';
 import Form from '@components/controls/Form';
-import { scale, typography } from '@scripts/gds';
-import { FC, HTMLProps, useMemo } from 'react';
-import { Column } from 'react-table';
+
+import { scale } from '@scripts/gds';
+
 import { NodeField, NodeFieldProps } from './Field';
 
-export interface NodeDetailsProps extends HTMLProps<HTMLDivElement> {
+export interface NodeDetailsProps<T> extends Omit<HTMLProps<HTMLDivElement>, 'onSubmit'> {
     nodeName: string;
     nodeFields: NodeFieldProps[];
     childrenFields: Column<Data>[];
     childrenData: Data[];
     readOnly?: boolean;
     labelWidth?: number;
+    onGoToDetails?: (row: Data) => void;
+    onFieldsChange?: (val: Record<keyof T, any>) => void;
+    onDirty?: (val: boolean) => void;
+    onTableChange?: () => void;
 }
 
-export const NodeDetails: FC<NodeDetailsProps> = ({
-    nodeName,
+const NodeDetailsForm = <T,>({
+    onFieldsChange,
+    onDirty,
+    readOnly,
+    nodeFields,
+    ...formProps
+}: FormikProps<T> & {
+    onFieldsChange: NodeDetailsProps<T>['onFieldsChange'];
+    onDirty: NodeDetailsProps<T>['onDirty'];
+    nodeFields: NodeDetailsProps<T>['nodeFields'];
+    readOnly: NodeDetailsProps<T>['readOnly'];
+}) => {
+    useEffect(() => {
+        if (onDirty) onDirty(formProps.dirty);
+    }, [formProps.dirty, onDirty]);
+
+    useEffect(() => {
+        if (onFieldsChange && formProps.dirty) {
+            onFieldsChange(formProps.values);
+        }
+    }, [formProps.values, onFieldsChange, formProps.dirty]);
+
+    return (
+        <>
+            {nodeFields.map(field => (
+                <NodeField
+                    key={field.name}
+                    {...field}
+                    readOnly={readOnly}
+                    className={field.className}
+                    css={{
+                        marginBottom: scale(2),
+                    }}
+                />
+            ))}
+        </>
+    );
+};
+
+export const NodeDetails = <T,>({
+    // nodeName,
     nodeFields,
     childrenFields,
     childrenData,
     readOnly = false,
+    onGoToDetails,
+    onFieldsChange,
+    onDirty,
     ...props
-}) => {
+}: NodeDetailsProps<T>) => {
     const initialValues = useMemo(
         () =>
             nodeFields.reduce((data, field) => {
@@ -36,17 +86,14 @@ export const NodeDetails: FC<NodeDetailsProps> = ({
                 return { ...data, [field.name]: val || '' };
             }, {}),
         [nodeFields]
-    );
+    ) as T;
 
     return (
         <div {...props}>
-            <h4 css={{ ...typography('h3') }}>Node name: {nodeName}</h4>
             <Form
                 initialValues={initialValues}
                 enableReinitialize
-                onSubmit={vals => {
-                    console.log(vals);
-                }}
+                onSubmit={() => {}}
                 css={{
                     maxWidth: '75%',
                     display: 'grid',
@@ -54,17 +101,15 @@ export const NodeDetails: FC<NodeDetailsProps> = ({
                     columnGap: scale(2),
                 }}
             >
-                {nodeFields.map(field => (
-                    <NodeField
-                        key={field.name}
-                        {...field}
+                {formProps => (
+                    <NodeDetailsForm<T>
+                        onFieldsChange={onFieldsChange}
+                        onDirty={onDirty}
                         readOnly={readOnly}
-                        className={field.className}
-                        css={{
-                            marginBottom: scale(2),
-                        }}
+                        nodeFields={nodeFields}
+                        {...formProps}
                     />
-                ))}
+                )}
             </Form>
             <Table
                 allowRowSelect
@@ -74,12 +119,20 @@ export const NodeDetails: FC<NodeDetailsProps> = ({
                     {
                         type: 'edit',
                         text: 'Редактировать биты',
-                        action: row => alert(JSON.stringify(row)),
+
+                        action: row => {
+                            if (onGoToDetails && !Array.isArray(row)) {
+                                alert(JSON.stringify(row));
+                                onGoToDetails(row);
+                            }
+                        },
                     },
                 ]}
                 onRowClick={() => {}}
                 onRowContextMenu={() => {}}
-                onDoubleClick={() => {}}
+                onDoubleClick={() => {
+                    // if (data && onRowDoubleClick) onRowDoubleClick(data);
+                }}
                 data={childrenData}
                 columns={childrenFields}
                 renderHeader={selectedRows => (

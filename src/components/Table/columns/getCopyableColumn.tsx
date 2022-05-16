@@ -1,11 +1,16 @@
-import Form from "@components/controls/Form";
-import Tooltip from "@components/controls/Tooltip";
-import { NodeField, NodeFieldProps } from "@components/NodeDetails/Field";
+import { useEffect, useState } from 'react';
+import { followCursor } from 'tippy.js';
+
+import { NodeField, NodeFieldProps } from '@components/NodeDetails/Field';
+import Form from '@components/controls/Form';
+import Tooltip from '@components/controls/Tooltip';
+
 import { Button, scale } from '@scripts/gds';
-import { useEffect, useState } from "react";
-import { followCursor } from "tippy.js";
-import { Cell, CellProps } from "../Cell";
-import { ExtendedColumn } from "../types";
+
+import WarehouseIcon from '@icons/small/warehouse.svg';
+
+import { Cell, CellProps } from '../Cell';
+import { ExtendedColumn } from '../types';
 
 export const getCopyableColumn = ({
     accessor,
@@ -26,20 +31,26 @@ export const getCopyableColumn = ({
 
         const getTooltipContent = () => (
             <>
-                <Form initialValues={{ copyVal: '' }} onSubmit={(vals) => {
-                    pasteToColumn(accessor, vals.copyVal);
+                <Form
+                    initialValues={{ copyVal: '' }}
+                    onSubmit={vals => {
+                        pasteToColumn(accessor, vals.copyVal);
 
-                    setVisible(false);
-                }} css={{
-                    padding: '0 8px',
-                }}>
+                        setVisible(false);
+                    }}
+                    css={{
+                        padding: '0 8px',
+                    }}
+                >
                     <NodeField
                         label="Клонируемое значение"
                         name="copyVal"
                         value=""
                         type={type}
                     />
-                    <Button type="submit" css={{ marginTop: scale(2) }}>Вставить</Button>
+                    <Button type="submit" css={{ marginTop: scale(2) }}>
+                        Вставить
+                    </Button>
                     {/* <ul>
                         <li>
                             <ContentBtn
@@ -93,7 +104,13 @@ export const getCopyableColumn = ({
                             e.preventDefault();
                             setVisible(true);
                         }}
+                        css={{
+                            display: 'flex',
+                            gap: scale(1, true),
+                        }}
+                        title="ПКМ для множественного редактирования"
                     >
+                        <WarehouseIcon />
                         {Header}
                     </button>
                 </Tooltip>

@@ -1,4 +1,13 @@
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { QueryClient, dehydrate } from 'react-query';
+
 import { getXML } from '@api/xml/api';
+
+import { useCommon } from '@context/common';
+import { SaveBeforeExitProvider, useSaveBeforeExit } from '@context/saveBeforeExit';
+
 import Block from '@components/Block';
 import { NodeDetails } from '@components/NodeDetails';
 import { NodeFieldProps } from '@components/NodeDetails/Field';
@@ -10,17 +19,16 @@ import {
     getSelectColumn,
     getSettingsColumn,
 } from '@components/Table';
-import { useCommon } from '@context/common';
+import { getCopyableColumn } from '@components/Table/columns/getCopyableColumn';
+
 import { ACCESS_TYPE_OPTIONS } from '@scripts/constants';
+import { Button, scale, typography, useTheme } from '@scripts/gds';
 import getTotalPageData, {
     SVD_PATH,
     TotalPageDataProps,
 } from '@scripts/getTotalPageData';
-import { Peripheral } from '@scripts/xml';
-import { useRouter } from 'next/router';
-import { useCallback, useMemo } from 'react';
-import { dehydrate, QueryClient } from 'react-query';
-import { getCopyableColumn } from '@components/Table/columns/getCopyableColumn';
+import { useLinkCSS, usePrevious } from '@scripts/hooks';
+import { Peripheral, Register } from '@scripts/xml';
 
 type PartialRecord<K extends keyof any, T> = Partial<Record<K, T>>;
 type ExtendedFieldProps = Partial<NodeFieldProps> & {
@@ -71,7 +79,7 @@ const EDITABLE_FIELDS: PartialRecord<keyof Peripheral, ExtendedFieldProps> = {
     },
 };
 
-const ControllerNode = () => {
+const ControllerNode = ({ setLoading }: { setLoading: (b: boolean) => void }) => {
     const {
         query: { id },
     } = useRouter();
@@ -95,37 +103,39 @@ const ControllerNode = () => {
             value: initialFieldProps.initialValue || '',
             ...(svdData !== undefined &&
                 svdData !== null && {
-                value: svdData,
-            }),
+                    value: svdData,
+                }),
             ...initialFieldProps,
             ...(initialFieldProps.valueFunction && {
                 value: initialFieldProps.valueFunction(svdData),
             }),
         });
 
-        return entries.map<NodeFieldProps | null>(entry => {
-            const key = entry[0];
+        return entries
+            .map<NodeFieldProps | null>(entry => {
+                const key = entry[0];
 
-            const svdData = peripheral?.[key];
+                const svdData = peripheral?.[key];
 
-            console.log('svdData:', svdData);
+                console.log('svdData:', svdData);
 
-            if (!svdData) {
-                return null;
-            }
+                if (!svdData) {
+                    return null;
+                }
 
-            const initialFieldProps = entry[1];
-            const res = convert(key, svdData, initialFieldProps);
-            if (initialFieldProps.type === 'nested') {
-                res.value = res.value.map((e: any) => {
-                    console.log('e=', e, 'svdData=', svdData);
-                    return convert(e.name, (svdData as any)[e.name], e);
-                });
-            }
+                const initialFieldProps = entry[1];
+                const res = convert(key, svdData, initialFieldProps);
+                if (initialFieldProps.type === 'nested') {
+                    res.value = res.value.map((e: any) => {
+                        console.log('e=', e, 'svdData=', svdData);
+                        return convert(e.name, (svdData as any)[e.name], e);
+                    });
+                }
 
-            delete res.valueFunction;
-            return res as NodeFieldProps;
-        }).filter(Boolean) as NodeFieldProps[];
+                delete res.valueFunction;
+                return res as NodeFieldProps;
+            })
+            .filter(Boolean) as NodeFieldProps[];
     }, [parsedId, xmlData]);
 
     // console.log(fields);
@@ -135,37 +145,53 @@ const ControllerNode = () => {
         const { device } = xmlData;
         if (!device.peripherals) return [];
         const { peripheral } = device.peripherals;
+        const peripheralArray = Array.isArray(peripheral) ? peripheral : [peripheral];
 
-        return peripheral.map<Data>((p, i) => ({
+        const currentPeripheral = peripheralArray[parsedId];
+        const { register } = currentPeripheral.registers || {};
+        if (!register) return [];
+
+        const registerArray = Array.isArray(register) ? register : [register];
+
+        return registerArray.map<Data>((p, i) => ({
             id: i,
             name: p.name,
             description: p.description,
-            baseAddress: p.baseAddress,
+            addressOffset: p.addressOffset,
             size: p.size,
             access: p.access,
             resetValue: p.resetValue,
             resetMask: p.resetMask,
         }));
-    }, [xmlData]);
+    }, [parsedId, xmlData]);
 
     const pasteToColumn = useCallback(
         (col: string, val: any) => {
-            const column = col as keyof Peripheral;
+            const column = col as keyof Register;
 
             setXmlData({
                 ...xmlData!,
                 device: {
                     ...xmlData!.device,
                     peripherals: {
-                        peripheral: xmlData!.device.peripherals!.peripheral.map(e => ({
-                            ...e,
-                            [column]: val,
-                        })),
+                        peripheral: xmlData!.device.peripherals!.peripheral.map(
+                            (e, i) => ({
+                                ...e,
+                                ...(i === parsedId && {
+                                    registers: {
+                                        register: e.registers.register.map(r => ({
+                                            ...r,
+                                            [column]: val,
+                                        })),
+                                    },
+                                }),
+                            })
+                        ),
                     },
                 },
             });
         },
-        [setXmlData, xmlData]
+        [parsedId, setXmlData, xmlData]
     );
 
     const childrenCols: ExtendedColumn[] = useMemo(
@@ -186,7 +212,7 @@ const ControllerNode = () => {
                 accessor: 'description',
             },
             getCopyableColumn({
-                accessor: 'baseAddress',
+                accessor: 'addressOffset',
                 Header: 'Смещ. адреса',
                 type: 'binary',
                 cellType: 'binary',
@@ -221,13 +247,81 @@ const ControllerNode = () => {
         [pasteToColumn]
     );
 
+    const { push } = useRouter();
+    const { isDirty, setGoingToLink, setDirty, shouldSave } = useSaveBeforeExit();
+
+    const prevShouldSave = usePrevious(shouldSave);
+
+    useEffect(() => {
+        if (prevShouldSave === shouldSave) return;
+        if (!shouldSave) return;
+
+        console.log(
+            'done a large save operation! setDirty = true because form will be reinitialized'
+        );
+
+        setLoading(true);
+        setTimeout(() => {
+            setDirty(false);
+            setLoading(false);
+        }, 2000);
+    }, [shouldSave, prevShouldSave, setDirty, setLoading]);
+
+    const linkCSS = useLinkCSS('blue');
+    const { colors } = useTheme();
+
     return (
-        <NodeDetails
-            childrenData={childrenData}
-            childrenFields={childrenCols}
-            nodeFields={fields}
-            nodeName={`Peripheral ${parsedId}`}
-        />
+        <Block>
+            <Block.Header>
+                <div css={{ display: 'flex', alignItems: 'center', gap: scale(2) }}>
+                    <h1 css={{ ...typography('h1') }}>Элемент периферии #{parsedId}</h1>
+                    <Link href="/controller" passHref>
+                        <a
+                            css={linkCSS}
+                            {...(isDirty && {
+                                onClick: e => {
+                                    e.preventDefault();
+                                    setGoingToLink('/controller');
+                                },
+                            })}
+                        >
+                            {'<'} К контроллеру
+                        </a>
+                    </Link>
+                </div>
+                {isDirty && (
+                    <div>
+                        <p css={{ color: colors?.danger }}>
+                            Есть несохраненные изменения!
+                        </p>
+                    </div>
+                )}
+            </Block.Header>
+            <Block.Body>
+                <NodeDetails
+                    childrenData={childrenData}
+                    childrenFields={childrenCols}
+                    nodeFields={fields}
+                    nodeName={`Peripheral ${parsedId}`}
+                    onGoToDetails={({ id }) => {
+                        const link = `/registers/${id}`;
+                        if (isDirty) setGoingToLink(link);
+                        else push(link);
+                    }}
+                    onDirty={setDirty}
+                />
+            </Block.Body>
+            <Block.Footer>
+                <Button>Сохранить</Button>
+                {isDirty && (
+                    <div>
+                        <p css={{ color: colors?.danger }}>
+                            Есть несохраненные изменения!
+                        </p>
+                    </div>
+                )}
+            </Block.Footer>
+        </Block>
     );
 };
 
@@ -253,13 +347,13 @@ export async function getServerSideProps(data: TotalPageDataProps) {
 }
 
 export default function PeripheryPage() {
+    const [isLoading, setLoading] = useState(false);
+
     return (
-        <PageWrapper title="PeripheryPage">
-            <Block>
-                <Block.Body>
-                    <ControllerNode />
-                </Block.Body>
-            </Block>
+        <PageWrapper title="PeripheryPage" isLoading={isLoading}>
+            <SaveBeforeExitProvider>
+                <ControllerNode setLoading={setLoading} />
+            </SaveBeforeExitProvider>
         </PageWrapper>
     );
 }

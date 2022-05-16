@@ -1,4 +1,12 @@
+import { useRouter } from 'next/router';
+import { useEffect, useMemo, useState } from 'react';
+import { QueryClient, dehydrate } from 'react-query';
+
 import { getXML } from '@api/xml/api';
+
+import { useCommon } from '@context/common';
+import { SaveBeforeExitProvider, useSaveBeforeExit } from '@context/saveBeforeExit';
+
 import Block from '@components/Block';
 import { NodeDetails } from '@components/NodeDetails';
 import { NodeFieldProps } from '@components/NodeDetails/Field';
@@ -10,15 +18,15 @@ import {
     getSelectColumn,
     getSettingsColumn,
 } from '@components/Table';
-import { useCommon } from '@context/common';
+
 import { ACCESS_TYPE_OPTIONS } from '@scripts/constants';
+import { Button, typography, useTheme } from '@scripts/gds';
 import getTotalPageData, {
-    TotalPageDataProps,
     SVD_PATH,
+    TotalPageDataProps,
 } from '@scripts/getTotalPageData';
-import { Device } from '@scripts/xml';
-import { useMemo } from 'react';
-import { QueryClient, dehydrate } from 'react-query';
+import { usePrevious } from '@scripts/hooks';
+import { Device, buildXML } from '@scripts/xml';
 
 const childrenCols: ExtendedColumn[] = [
     getSelectColumn(),
@@ -66,8 +74,10 @@ const childrenCols: ExtendedColumn[] = [
 
 type PartialRecord<K extends keyof any, T> = Partial<Record<K, T>>;
 
-const ControllerNode = () => {
-    const { xmlData } = useCommon();
+const ControllerNode = ({ setLoading }: { setLoading: (b: boolean) => void }) => {
+    const { xmlData, setXmlData } = useCommon();
+    const { push } = useRouter();
+    const { colors } = useTheme();
 
     const fields = useMemo(() => {
         if (!xmlData) return [];
@@ -124,7 +134,7 @@ const ControllerNode = () => {
 
                 const initialFieldProps = entry[1];
 
-                return {
+                const res = {
                     name: key,
                     ...(data && {
                         value: data,
@@ -134,6 +144,10 @@ const ControllerNode = () => {
                         value: initialFieldProps.valueFunction(data),
                     }),
                 };
+
+                delete res.valueFunction;
+
+                return res;
             })
             .filter(Boolean) as NodeFieldProps[];
     }, [xmlData]);
@@ -144,9 +158,9 @@ const ControllerNode = () => {
         if (!device.peripherals) return [];
         const { peripheral } = device.peripherals;
 
-        console.log(peripheral);
+        const peripheralArray = Array.isArray(peripheral) ? peripheral : [peripheral];
 
-        return peripheral.map<Data>((p, i) => ({
+        return peripheralArray.map<Data>((p, i) => ({
             id: i,
             name: p.name,
             description: p.description,
@@ -158,13 +172,93 @@ const ControllerNode = () => {
         }));
     }, [xmlData]);
 
+    const { isDirty, setGoingToLink, setDirty, shouldSave } = useSaveBeforeExit();
+
+    const prevShouldSave = usePrevious(shouldSave);
+
+    useEffect(() => {
+        if (prevShouldSave === shouldSave) return;
+        if (!shouldSave) return;
+
+        console.log(
+            'done a large save operation! setDirty = true because form will be reinitialized'
+        );
+
+        setLoading(true);
+        setTimeout(() => {
+            setDirty(false);
+            setLoading(false);
+        }, 2000);
+    }, [shouldSave, prevShouldSave, setDirty, setLoading]);
+
+    const actualXML = useMemo(() => {
+        console.log(xmlData?.device.resetMask);
+        return buildXML(xmlData);
+    }, [xmlData]);
+
     return (
-        <NodeDetails
-            childrenData={childrenData}
-            childrenFields={childrenCols}
-            nodeFields={fields}
-            nodeName="controller"
-        />
+        <>
+            <Block>
+                <Block.Header>
+                    <h1 css={{ ...typography('h1') }}>Элемент &quot;Контроллер&quot;</h1>
+                    {isDirty && (
+                        <div>
+                            <p css={{ color: colors?.danger }}>
+                                Есть несохраненные изменения!
+                            </p>
+                        </div>
+                    )}
+                </Block.Header>
+                <Block.Body>
+                    <NodeDetails<Device>
+                        childrenData={childrenData}
+                        childrenFields={childrenCols}
+                        nodeFields={fields}
+                        onGoToDetails={({ id }) => {
+                            const link = `/peripherals/${id}`;
+                            if (isDirty) setGoingToLink(link);
+                            else push(link);
+                        }}
+                        onDirty={setDirty}
+                        onFieldsChange={vals => {
+                            const newXmlData = {
+                                device: {
+                                    ...xmlData!.device,
+                                    ...vals,
+                                },
+                            };
+                            setXmlData(newXmlData);
+                        }}
+                        nodeName="controller"
+                    />
+                </Block.Body>
+                <Block.Footer>
+                    <Button>Сохранить</Button>
+                    {isDirty && (
+                        <div>
+                            <p css={{ color: colors?.danger }}>
+                                Есть несохраненные изменения!
+                            </p>
+                        </div>
+                    )}
+                </Block.Footer>
+            </Block>
+
+            <div
+                css={{
+                    position: 'fixed',
+                    right: 0,
+                    top: 0,
+                    width: 400,
+                    height: '100vh',
+                    overflow: 'scroll',
+                    background: '#000',
+                    color: 'lime',
+                }}
+            >
+                <pre>{actualXML}</pre>
+            </div>
+        </>
     );
 };
 
@@ -190,13 +284,13 @@ export async function getServerSideProps(data: TotalPageDataProps) {
 }
 
 export default function Controller() {
+    const [isLoading, setLoading] = useState(false);
+
     return (
-        <PageWrapper title="Главная страница">
-            <Block>
-                <Block.Body>
-                    <ControllerNode />
-                </Block.Body>
-            </Block>
+        <PageWrapper title="Главная страница" isLoading={isLoading}>
+            <SaveBeforeExitProvider>
+                <ControllerNode setLoading={setLoading} />
+            </SaveBeforeExitProvider>
         </PageWrapper>
     );
 }
